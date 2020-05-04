@@ -105,23 +105,32 @@ document.addEventListener('DOMContentLoaded', function(){
         })
     }
 
+    navBar.addEventListener('click', function(event){
+        let eventTarget = event.target;
+
+        //TODO: helper function to clear the page!!!
+        //TODO: modify showMonster(monster)!!!!
+        if (eventTarget.className === 'nav-monsters-collection') {
+            let div = document.querySelector('.profile-page')
+            div.style.display = 'none';
+            getMonsters();
+        }
+    })
+
     
-    // function getMonsters() {
-    //     fetch(monstersUrl)
-    //     .then(res => res.json())
-    //     .then(function(result) {
-    //         result.forEach(function(monster){
-    //             showMonster(monster)
-    //         })
-    //     })
-    // }
+    function getMonsters() {
+        fetch(monstersUrl)
+        .then(res => res.json())
+        .then(function(result) {
+            result.forEach(function(monster){
+                showMonster(monster)
+            })
+        })
+    }
 
-    // function showMonster(monster) {
-
-    //     let img = document.createElement('img')
-    //     img.setAttribute('src', monster.img_url)
-    //     document.body.append(img);
-    // }
-
-    // getMonsters();
+    function showMonster(monster) {
+        let img = document.createElement('img')
+        img.setAttribute('src', monster.img_url)
+        document.body.append(img);
+    }
 })
