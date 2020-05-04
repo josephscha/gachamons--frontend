@@ -4,7 +4,10 @@ const usersUrl = 'http://localhost:3000/users';
 
 document.addEventListener('DOMContentLoaded', function(){
 
+    const navBar = document.querySelector('.nav-bar');
     const logInButton = document.querySelector('.log-in-button')
+
+    //log-in page/home page
     logInButton.addEventListener('click', function(event){
         event.preventDefault();
         let eventTarget = event.target.parentNode;
@@ -38,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function showUser(id) {
+        navBar.dataset.userId = id;
         fetch(`${usersUrl}/${id}`)
         .then(res => res.json())
         .then(function(userInfo){
