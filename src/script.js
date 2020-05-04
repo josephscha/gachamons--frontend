@@ -1,23 +1,26 @@
 const monstersUrl = 'http://127.0.0.1:3000/monsters';
 const usersUrl = 'http://localhost:3000/users';
 
+
 document.addEventListener('DOMContentLoaded', function(){
 
-    document.addEventListener('submit', function(event){
+    const logInButton = document.querySelector('.log-in-button')
+    logInButton.addEventListener('click', function(event){
         event.preventDefault();
-        let eventTarget = event.target;
+        let eventTarget = event.target.parentNode;
         let username = eventTarget.username.value;
         let homePage = document.querySelector('.home-page')
+        homePage.style.display = 'none';
         fetch(usersUrl)
         .then(res => res.json())
         .then(function(result){
             let userId = findUser(result, username);
             if (userId) {
-                //render the user's profile
-                homePage.style.display = 'none';
+                //render the user's profile                
                 showUser(userId);
             } else {
                 //render sign up page;
+                showSignUp();
             }
         })
     })
@@ -54,6 +57,48 @@ document.addEventListener('DOMContentLoaded', function(){
         `
         div.dataset.userId = user.id;
         document.body.append(div);
+    }
+
+    function showSignUp() {
+        let div = document.createElement('div')
+        div.setAttribute('class', 'sign-up-page')
+        div.innerHTML = `
+        <form id='sign-up-form'>
+        <input type="text" name="username" value="" placeholder="Enter username">
+        <input type="text" name="nickname" value="" placeholder="Enter nickname">
+        <select id="gender">
+            <option value="male">male</option>
+            <option value="female">female</option>
+        </select>
+        <input type="text" name="img" value="" placeholder="Enter user's image url">
+        <input type="submit" value="Submit">
+        </form>
+        `
+        document.body.append(div);
+        div.addEventListener('submit', function(event) {
+            event.preventDefault();
+            let eventTarget = event.target;
+            let signUpForm = document.querySelector('.sign-up-page')
+            let newUser = {
+                'username': eventTarget.username.value,
+                'nickname': eventTarget.nickname.value,
+                'gender': eventTarget.gender.value,
+                'img': eventTarget.img.value
+            }
+            
+            fetch(usersUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    accept: 'application/json'
+                }, 
+                body: JSON.stringify(newUser)
+            }).then(res => res.json())
+            .then(function(result){
+                signUpForm.style.display = 'none';
+                showUser(result.id);
+            })
+        })
     }
 
     
