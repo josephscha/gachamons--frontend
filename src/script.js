@@ -4,18 +4,22 @@ const usersUrl = 'http://localhost:3000/users';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    let navBar = null;
+    const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
+    let navBar = document.querySelector('.nav-bar');
+    navBar.style.display = switchDisplay['Disappear'];
+
     const logInButton = document.querySelector('.log-in-button')
 
     //log-in page/home page
     logInButton.addEventListener('click', function (event) {
+        event.preventDefault();
         let eventTarget = event.target.parentNode;
         let username = eventTarget.username.value;
+        //TODO: simplify the code when log-out
 
-        //let homePage = document.querySelector('.home-page')
         clearPage();
-        showNavBar();
-        //homePage.style.display = 'none';
+        navBar.style.display = 'block';
+        document.body.append(navBar);
         fetch(usersUrl)
             .then(res => res.json())
             .then(function (result) {
@@ -71,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
             let eventTarget = event.target;
             let userId = eventTarget.dataset.userId;
             showEditForm(userId)
-
         })
     }
 
@@ -112,10 +115,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 div.addEventListener('submit', function (event) {
                     event.preventDefault();
                     let eventTarget = event.target;
-        
                     ///clear page!!!!!
                     clearPage();
-                    showNavBar();
 
                     let editForm = document.querySelector('.edit-profile-page')
                     let editUser = {
@@ -134,9 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         body: JSON.stringify(editUser)
                     }).then(res => res.json())
                         .then(function (result) {
-                            //editForm.style.display = 'none';
                             clearPage();
-                            showNavBar();
                             showUser(result.id);
                         })
                 })
@@ -197,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(newUser)
             }).then(res => res.json())
                 .then(function (result) {
-                    //signUpForm.style.display = 'none';
                     showUser(result.id);
                 })
         })
@@ -206,14 +204,8 @@ document.addEventListener('DOMContentLoaded', function () {
     navBar.addEventListener('click', function (event) {
         let eventTarget = event.target;
 
-        //TODO: helper function to clear the page!!!
-        //TODO: modify showMonster(monster)!!!!
-
         if (eventTarget.className === 'nav-monsters-collection') {
-            let div = document.querySelector('.profile-page')
             clearPage();
-            showNavBar();
-            //div.style.display = 'none';
             getMonsters();
         }
     })
@@ -223,38 +215,30 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(monstersUrl)
             .then(res => res.json())
             .then(function (result) {
+                let monsterContainer = document.createElement('div')
+                document.body.append(monsterContainer);
+                monsterContainer.setAttribute('class', 'monster-container');
                 result.forEach(function (monster) {
-                    showMonster(monster)
+                    let div = showMonster(monster)
+                    monsterContainer.append(div);
                 })
             })
     }
 
     function showMonster(monster) {
-        let img = document.createElement('img')
-        img.setAttribute('src', monster.img_url)
-        document.body.append(img);
-    }
-
-    function clearPage() {
-        document.body.innerHTML = ``; 
-    }
-
-    function showNavBar(){
-
         let div = document.createElement('div')
-        div.setAttribute('class', 'nav-bar')
-        div.style.cursor = 'pointer';
+        div.setAttribute('class', 'monster-tile')
         div.innerHTML = `
-        <a class='nav-profile'>Profile | </a>
-        <a class='nav-monsters'>My Monsters | </a>
-        <a class='nav-monsters-collection'>All Monsters | </a>
-        <a class='nav-inventory'>Inventory | </a>
-        <a class='nav-shop'>Shop | </a>
-        <a class='nav-balance'>Add balance | </a>
-        <a class='nav-logout'>Log out</a>
+        <img src=${monster.img_url} alt=${monster.name}>
+        <p>${monster.name}, level ${monster.level}</p>
         `
+        return div;
+    }
 
-        navBar = div;
-        document.body.append(div);
+    function clearPage() {      
+        let children = Array.from(document.body.children);
+        navBar = children[0];
+        document.body.innerHTML = ``;
+        document.body.append(navBar);
     }
 })
