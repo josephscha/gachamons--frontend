@@ -231,8 +231,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.body.append(div);
             })
             navBar.style.display = 'none';
-            //go back to home page;
-
         }
     })
 
