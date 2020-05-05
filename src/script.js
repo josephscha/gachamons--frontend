@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
     let navBar = document.querySelector('.nav-bar');
     navBar.style.display = switchDisplay['Disappear'];
+    let homePage = Array.from(document.body.children);
 
     const logInButton = document.querySelector('.log-in-button')
 
@@ -18,8 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
         //TODO: simplify the code when log-out
 
         clearPage();
+        navBar = document.querySelector('.nav-bar');
         navBar.style.display = 'block';
-        document.body.append(navBar);
+        //document.body.append(navBar);
         fetch(usersUrl)
             .then(res => res.json())
             .then(function (result) {
@@ -32,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     showSignUp();
                 }
             })
+        eventTarget.reset();
     })
 
     function findUser(array, target) {
@@ -203,10 +206,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     navBar.addEventListener('click', function (event) {
         let eventTarget = event.target;
-
+        let id = eventTarget.parentNode.dataset.userId;
         if (eventTarget.className === 'nav-monsters-collection') {
             clearPage();
             getMonsters();
+        } else if (eventTarget.className === 'nav-profile'){
+            clearPage();
+            showUser(id);
+        } else if (eventTarget.className === 'nav-monsters') {
+            clearPage();
+
+        } else if (eventTarget.className === 'nav-inventory') {
+            clearPage();
+
+        } else if (eventTarget.className === 'nav-shop') {
+            clearPage();
+
+        } else if (eventTarget.className === 'nav-balance') {
+            clearPage();
+
+        } else if (eventTarget.className === 'nav-logout') {
+            document.body.innerHTML = ``;
+            homePage.forEach(function(div){
+                document.body.append(div);
+            })
+            navBar.style.display = 'none';
+            //go back to home page;
+
         }
     })
 
@@ -236,9 +262,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function clearPage() {      
-        let children = Array.from(document.body.children);
-        navBar = children[0];
+        //let children = Array.from(document.body.children);
+        navBar = document.querySelector('.nav-bar');
         document.body.innerHTML = ``;
         document.body.append(navBar);
+        return navBar;
     }
 })
