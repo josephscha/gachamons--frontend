@@ -348,22 +348,64 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(result => showInventory(parseInt(navBar.dataset.userId)))
         }
         else if (event.target.className === "buy-button") {
-            clearPage()
             // when user clicks buy button, check inventory to see if user has the item
             // if user HAS item, increment quantity by 1 (PATCH)
             // if user does NOT have item, create (POST)
-            fetch(inventoriesUrl)
-            .then(resp => resp.json())
-            .then
+            debugger;
+            if(checkInventory(parseInt(event.target.dataset.itemId), parseInt(navBar.dataset.userId))) {
+                
+            }
+                    //     let newQuantity = inventory.quantity
+                    //     newQuantity += 1;
+                    //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
+                    //     'item_id': parseInt(event.target.dataset.itemId), 
+                    //     'quantity': newQuantity};
+                    //     fetch(`${inventoriesUrl}/${inventory.id}`, {
+                    //         method: 'PATCH',
+                    //         headers: requestHeaders,
+                    //         body: JSON.stringify(newInventory)
+                    //     })
+                    // } else {
+                    //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
+                    //     'item_id': parseInt(event.target.dataset.itemId), 
+                    //     'quantity': 1};
+                    //     fetch(inventoriesUrl, {
+                    //         method: 'POST',
+                    //         headers: requestHeaders,
+                    //         body: JSON.stringify(newInventory)
+                    //     })
+                    // }
+   
             // LEFT OFF HERE
-            fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
-                method: "PATCH",
-                headers: requestHeaders,
-                body: JSON.stringify(updatedInventoryItem)
-            }).then(res => res.json())
-                .then(result => showInventory(parseInt(navBar.dataset.userId)))
+            // fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
+            //     method: "PATCH",
+            //     headers: requestHeaders,
+            //     body: JSON.stringify(updatedInventoryItem)
+            // }).then(res => res.json())
+            //     .then(result => showInventory(parseInt(navBar.dataset.userId)))
         }
     })
+
+    function checkInventory(itemId, userId) {
+        let flag = false;
+        fetch(inventoriesUrl)
+            .then(resp => resp.json())
+            .then(function(result){
+                result.forEach(function(inventory){
+
+                    if (inventory['item_id'] === itemId && inventory['user_id'] === userId) {
+                        
+                        flag = true;
+            
+                        if (flag === true) {
+                            
+                            return true;
+                        }
+                    
+                    }
+                })
+            })
+    }
 
     function summonMonster(itemName) {
         if (itemName === "Tamago") {
