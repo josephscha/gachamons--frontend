@@ -232,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
     navBar.addEventListener('click', function (event) {
         let eventTarget = event.target;
         let id = eventTarget.parentNode.dataset.userId;
+        
         if (eventTarget.className === 'nav-monsters-collection') {
             clearPage();
             getMonsters();
@@ -251,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
-            showItems();
+            showItems(id);
 
             
             //after bought an item, substract the balance
@@ -269,17 +270,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
-    function showItems() {
+    function showItems(id) {
         fetchRails(itemsurl)
         .then(function(items){
             let itemContainer = document.createElement('div')
             itemContainer.setAttribute('class', 'egg-container')
             document.body.append(itemContainer);
-
-            items.forEach(function(item){
+            fetch(`${usersUrl}/${id}`)
+            .then(res => res.json())
+            .then(function(res){
+                
+              balance = res['balance'];
+              itemContainer.innerHTML = `
+              <h1>Balance: ${balance}</h1>
+              `
+              items.forEach(function(item){
                 let div = displayEgg(item);
                 itemContainer.append(div);
             })
+            }) 
+            //debugger;
         })
     }
 
