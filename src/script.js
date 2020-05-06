@@ -248,9 +248,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-inventory') {
             clearPage();
-            let normalMons = filterMons(allMons, 'normal');
-            let epicMons = filterMons(allMons, 'epic');
-            let legendaryMons = filterMons(allMons, 'legendary');
+            // let normalMons = filterMons(allMons, 'normal');
+            // let epicMons = filterMons(allMons, 'epic');
+            // let legendaryMons = filterMons(allMons, 'legendary');
             showInventory(id)
 
         } else if (eventTarget.className === 'nav-shop') {
@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 summonBtn.dataset.inventoryId = inventoryItem.id
                                 summonBtn.dataset.itemId = item.id
                                 summonBtn.dataset.quantity = inventoryItem.quantity
+                                summonBtn.dataset.itemName = item.name
                                 summonBtn.textContent = 'Summon!'
                                 inventoryTile.append(summonBtn)
                                 inventoryContainer.append(inventoryTile)
@@ -330,6 +331,10 @@ document.addEventListener('DOMContentLoaded', function () {
             newQuantity = parseInt(event.target.dataset.quantity) - 1
             updatedInventoryItem = { "user_id": parseInt(navBar.dataset.userId), "item_id": parseInt(event.target.dataset.itemId), "quantity": newQuantity }
             event.target.dataset.quantity = newQuantity
+            let monster = summonMonster(event.target.dataset.itemName)
+            let summonedMonster = showMonster(monster)
+            summonedMonster.setAttribute("id", "summoned-monster")
+            document.body.append(summonedMonster)
             fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
                 method: "PATCH",
                 headers: requestHeaders,
@@ -338,6 +343,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(result => showInventory(parseInt(navBar.dataset.userId)))
         }
     })
+
+    function summonMonster(itemName){
+        if (itemName === "Tamago"){
+            normalMons = filterMons(allMons, "normal")
+            let maxNum = normalMons.length - 1
+            let monster = normalMons[getRandomInt(maxNum)]
+            return monster
+        }
+        else if (itemName === "Lady Egga"){
+            let epicMons = filterMons(allMons, "epic")
+            let maxNum = epicMons.length - 1
+            let monster = epicMons[getRandomInt(maxNum)]
+            return monster
+        }
+        else {
+            let legendaryMons = filterMons(allMons, "legendary")
+            let maxNum = legendaryMons.length - 1
+            let monster = legendaryMons[getRandomInt(maxNum)]
+            return monster
+        }
+    }
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
 
     function showItems(id) {
         fetchRails(itemsurl)
@@ -414,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         div.setAttribute('class', 'monster-tile')
                         div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
-        <p>${monster.name}, level ${monster.level}</p>
+        <p>${monster.name}, rarity ${monster.rarity}</p>
         `
                         return div;
                     }
