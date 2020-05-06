@@ -315,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // user_id = parseInt(id)
                                 // item_id = item.id
                                 // add eventlistener to summonBtn
-                                // debugger;
                                 // send patch request to current inventory object
                                 // decrement quantity by 1, if quantity = 0, delete 
                                 // render updated inventoryitem
@@ -350,14 +349,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
-    function summonMonster(itemName){
-        if (itemName === "Tamago"){
+    function summonMonster(itemName) {
+        if (itemName === "Tamago") {
             normalMons = filterMons(allMons, "normal")
             let maxNum = normalMons.length - 1
             let monster = normalMons[getRandomInt(maxNum)]
             return monster
         }
-        else if (itemName === "Lady Egga"){
+        else if (itemName === "Lady Egga") {
             let epicMons = filterMons(allMons, "epic")
             let maxNum = epicMons.length - 1
             let monster = epicMons[getRandomInt(maxNum)]
@@ -372,8 +371,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function addMonsterToDatabase(monsterObj) {
-        let newSummon = {"user_id": parseInt(navBar.dataset.userId), "monster_id": monsterObj.id}
-        debugger;
+        let newSummon = { "user_id": parseInt(navBar.dataset.userId), "monster_id": monsterObj.id }
+
         fetch(summonsUrl, {
             method: "POST",
             headers: requestHeaders,
@@ -395,10 +394,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (summon['user_id'] === parseInt(userId)) {
                         let monsterId = summon['monster_id']
                         fetchRails(`${monstersUrl}/${monsterId}`)
-                        .then(function(result){
-                            let div = showMonster(result)
-                            userMonsters.append(div)
-                        })
+                            .then(function (result) {
+                                let div = showMonster(result)
+                                userMonsters.append(div)
+                            })
                     }
                 })
             })
@@ -426,13 +425,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             itemContainer.append(div);
                         })
                     })
-                //debugger;
             })
     }
 
 
     function displayEgg(item) {
-                        let div = document.createElement('div')
+        let div = document.createElement('div')
         let buyBtn = document.createElement('button')
         buyBtn.setAttribute('class', 'buy-button')
         buyBtn.dataset.itemId = item.id
@@ -450,10 +448,10 @@ document.addEventListener('DOMContentLoaded', function () {
         <p>Name: ${item.name}, Price: ${item.price} <br>
         ${item['description']}</p>
         `
-                        div.append(buyBtn);
-                        // div.append(summonBtn);
-                        return div;
-                    }
+        div.append(buyBtn);
+        // div.append(summonBtn);
+        return div;
+    }
 
     //fetch data from rails api, here using GET method only
     function fetchRails(url) {
@@ -465,28 +463,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     function getMonsters() {
-                        fetch(monstersUrl)
-                            .then(res => res.json())
-                            .then(function (result) {
-                                let monsterContainer = document.createElement('div')
-                                document.body.append(monsterContainer);
-                                monsterContainer.setAttribute('class', 'monster-container');
-                                result.forEach(function (monster) {
-                                    let div = showMonster(monster)
-                                    monsterContainer.append(div);
-                                })
-                            })
-                    }
+        fetch(monstersUrl)
+            .then(res => res.json())
+            .then(function (result) {
+                let monsterContainer = document.createElement('div')
+                document.body.append(monsterContainer);
+                monsterContainer.setAttribute('class', 'monster-container');
+                result.forEach(function (monster) {
+                    let div = showMonster(monster)
+                    monsterContainer.append(div);
+                })
+            })
+    }
 
     function showMonster(monster) {
-                        let div = document.createElement('div')
-                        div.setAttribute('class', 'monster-tile')
-                        div.innerHTML = `
+        let div = document.createElement('div')
+        div.setAttribute('class', 'monster-tile')
+        div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
         <p>${monster.name}, rarity: ${monster.rarity}</p>
         `
-                        return div;
-                    }
+        return div;
+    }
 
     function clearPage() {
         //let children = Array.from(document.body.children);
