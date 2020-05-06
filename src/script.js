@@ -275,65 +275,69 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showInventory(id) {
         fetchRails(`${inventoriesUrl}`)
-            .then(function (inventoryItems) {
-                let inventoryContainer = document.createElement(`div`)
-                inventoryContainer.className = `inventory-container`
-                document.body.append(inventoryContainer)
-                inventoryItems.forEach(function (inventoryItem) {
-                    if (inventoryItem.user_id === parseInt(id)) {
-                        // go into items database.
-                        fetch(itemsurl).then(resp => resp.json()).then(function (results) {
-                            results.forEach(function (item) {
-                                if (item.id === inventoryItem.item_id) {
-                                    let inventoryTile = document.createElement(`div`)
-                                    inventoryTile.className = `inventory-tile`
-                                    inventoryTile.innerHTML = `
-                                <img src=${item.img_url}>
-                                <p>${item.name}<br>
-                                ${item.description}<br>
-                                Quantity: ${inventoryItem.quantity}</p>
-                                `
-                                    let summonBtn = document.createElement(`button`)
-                                    summonBtn.setAttribute('class', 'summon-button')
-                                    summonBtn.dataset.inventoryId = inventoryItem.id
-                                    summonBtn.dataset.itemId = item.id
-                                    summonBtn.dataset.quantity = inventoryItem.quantity
-                                    summonBtn.textContent = 'Summon!'
-                                    inventoryTile.append(summonBtn)
-                                    inventoryContainer.append(inventoryTile)
-                                    // inventoryItemId = inventoryItem.id
-                                    // user_id = parseInt(id)
-                                    // item_id = item.id
-                                    // add eventlistener to summonBtn
-                                    // debugger;
-                                    // send patch request to current inventory object
-                                    // decrement quantity by 1, if quantity = 0, delete 
-                                    // render updated inventoryitem
-                                    // if summonBtn.dataset.id = 1, go into normalMons and pull out random object
-                                    // if id = 2, Epicmons
-                                    // if id = 3, LegendaryMons
-                                    // send post request to summons with pulled out object
-                                    
-                                    summonBtn.addEventListener(`click`, function (event) {
-                                        newQuantity = parseInt(event.target.dataset.quantity) - 1
-                                        updatedInventoryItem = { "user_id": parseInt(navBar.dataset.userId), "item_id": parseInt(event.target.dataset.itemId), "quantity": newQuantity }
-                                        event.target.dataset.quantity = newQuantity
-                                        fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
-                                            method: "PATCH",
-                                            headers: requestHeaders,
-                                            body: JSON.stringify(updatedInventoryItem)
-                                        }).then(res => res.json())
-                                        .then(function (result) {
-                                            // function here to render the summoned monster
-                                        })
-                                    })
-                                }
-                            })
-                        })
-                    }
-                })
-            })
+            .then(inventoryItems => renderInventoryPage(inventoryItems, id))
     }
+
+    function renderInventoryPage(inventoryItems, id) {
+        let inventoryContainer = document.createElement(`div`)
+        inventoryContainer.className = `inventory-container`
+        document.body.append(inventoryContainer)
+        inventoryItems.forEach(function (inventoryItem) {
+            if (inventoryItem.user_id === parseInt(id)) {
+                // go into items database.
+                fetch(itemsurl).then(resp => resp.json()).then(function (results) {
+                    results.forEach(function (item) {
+                        if (item.id === inventoryItem.item_id) {
+                            if (parseInt(inventoryItem.quantity) !== 0) {
+                                let inventoryTile = document.createElement(`div`)
+                                inventoryTile.className = `inventory-tile`
+                                inventoryTile.innerHTML = `
+                    <img src=${item.img_url}>
+                    <p>${item.name}<br>
+                    ${item.description}<br>
+                    Quantity: ${inventoryItem.quantity}</p>
+                    `
+                                let summonBtn = document.createElement(`button`)
+                                summonBtn.setAttribute('class', 'summon-button')
+                                summonBtn.dataset.inventoryId = inventoryItem.id
+                                summonBtn.dataset.itemId = item.id
+                                summonBtn.dataset.quantity = inventoryItem.quantity
+                                summonBtn.textContent = 'Summon!'
+                                inventoryTile.append(summonBtn)
+                                inventoryContainer.append(inventoryTile)
+                                // inventoryItemId = inventoryItem.id
+                                // user_id = parseInt(id)
+                                // item_id = item.id
+                                // add eventlistener to summonBtn
+                                // debugger;
+                                // send patch request to current inventory object
+                                // decrement quantity by 1, if quantity = 0, delete 
+                                // render updated inventoryitem
+                                // if summonBtn.dataset.id = 1, go into normalMons and pull out random object
+                                // if id = 2, Epicmons
+                                // if id = 3, LegendaryMons
+                                // send post request to summons with pulled out object
+                            }
+                        }
+                    })
+                })
+            }
+        })
+    }
+    document.body.addEventListener("click", function (event) {
+        if (event.target.className === "summon-button") {
+            clearPage()
+            newQuantity = parseInt(event.target.dataset.quantity) - 1
+            updatedInventoryItem = { "user_id": parseInt(navBar.dataset.userId), "item_id": parseInt(event.target.dataset.itemId), "quantity": newQuantity }
+            event.target.dataset.quantity = newQuantity
+            fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
+                method: "PATCH",
+                headers: requestHeaders,
+                body: JSON.stringify(updatedInventoryItem)
+            }).then(res => res.json())
+                .then(result => showInventory(parseInt(navBar.dataset.userId)))
+        }
+    })
 
     function showItems(id) {
         fetchRails(itemsurl)
@@ -341,85 +345,85 @@ document.addEventListener('DOMContentLoaded', function () {
                 let itemContainer = document.createElement('div')
                 itemContainer.setAttribute('class', 'egg-container')
                 document.body.append(itemContainer);
-                fetch(`${usersUrl}/${id}`)
-                    .then(res => res.json())
-                    .then(function (res) {
+                fetch(`${ usersUrl } /${id}`)
+                                .then(res => res.json())
+                                .then(function (res) {
 
-                        balance = res['balance'];
-                        itemContainer.innerHTML = `
+                                    balance = res['balance'];
+                                    itemContainer.innerHTML = `
               <h1>Balance: ${balance}</h1>
               `
-                        items.forEach(function (item) {
-                            let div = displayEgg(item);
-                            itemContainer.append(div);
+                                    items.forEach(function (item) {
+                                        let div = displayEgg(item);
+                                        itemContainer.append(div);
+                                    })
+                                })
+                            //debugger;
                         })
-                    })
-                //debugger;
-            })
-    }
+                }
 
     function displayEgg(item) {
-        let div = document.createElement('div')
+                        let div = document.createElement('div')
 
-        let buyBtn = document.createElement('button')
-        buyBtn.setAttribute('class', 'buy-button')
-        buyBtn.dataset.itemId = item.id
-        buyBtn.textContent = 'Buy'
+                        let buyBtn = document.createElement('button')
+                        buyBtn.setAttribute('class', 'buy-button')
+                        buyBtn.dataset.itemId = item.id
+                        buyBtn.textContent = 'Buy'
 
-        // let summonBtn = document.createElement('button')
-        // summonBtn.setAttribute('class', 'summon-button')
-        // summonBtn.dataset.itemId = item.id
-        // summonBtn.textContent = 'Summon!'
+                        // let summonBtn = document.createElement('button')
+                        // summonBtn.setAttribute('class', 'summon-button')
+                        // summonBtn.dataset.itemId = item.id
+                        // summonBtn.textContent = 'Summon!'
 
-        div.setAttribute('class', 'item-tile')
-        div.dataset.itemId = item.id;
-        div.innerHTML = `
+                        div.setAttribute('class', 'item-tile')
+                        div.dataset.itemId = item.id;
+                        div.innerHTML = `
         <img src=${item['img_url']}>
         <p>Name: ${item.name}, Price: ${item.price} <br>
         ${item['description']}</p>
         `
-        div.append(buyBtn);
-        // div.append(summonBtn);
-        return div;
-    }
+                        div.append(buyBtn);
+                        // div.append(summonBtn);
+                        return div;
+                    }
 
     //fetch data from rails api, here using GET method only
     function fetchRails(url) {
-        return fetch(url)
-            .then(res => res.json())
-            .then(result => result)
-    }
+                        return fetch(url)
+                            .then(res => res.json())
+                            .then(result => result)
+                    }
 
 
     function getMonsters() {
-        fetch(monstersUrl)
-            .then(res => res.json())
-            .then(function (result) {
-                let monsterContainer = document.createElement('div')
-                document.body.append(monsterContainer);
-                monsterContainer.setAttribute('class', 'monster-container');
-                result.forEach(function (monster) {
-                    let div = showMonster(monster)
-                    monsterContainer.append(div);
-                })
-            })
-    }
+                        fetch(monstersUrl)
+                            .then(res => res.json())
+                            .then(function (result) {
+                                let monsterContainer = document.createElement('div')
+                                document.body.append(monsterContainer);
+                                monsterContainer.setAttribute('class', 'monster-container');
+                                result.forEach(function (monster) {
+                                    let div = showMonster(monster)
+                                    monsterContainer.append(div);
+                                })
+                            })
+                    }
 
     function showMonster(monster) {
-        let div = document.createElement('div')
-        div.setAttribute('class', 'monster-tile')
-        div.innerHTML = `
+                        let div = document.createElement('div')
+                        div.setAttribute('class', 'monster-tile')
+                        div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
         <p>${monster.name}, level ${monster.level}</p>
         `
-        return div;
-    }
+                        return div;
+                    }
 
     function clearPage() {
-        //let children = Array.from(document.body.children);
-        navBar = document.querySelector('.nav-bar');
-        document.body.innerHTML = ``;
-        document.body.append(navBar);
-        return navBar;
-    }
+                        //let children = Array.from(document.body.children);
+                        navBar = document.querySelector('.nav-bar');
+                        document.body.innerHTML = ``;
+                        document.body.append(navBar);
+                        return navBar;
+                    }
 })
