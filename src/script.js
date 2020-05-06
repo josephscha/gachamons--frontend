@@ -248,8 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let normalMons  = filterMons(allMons, 'normal');
             let epicMons  = filterMons(allMons, 'epic');
             let legendaryMons  = filterMons(allMons, 'legendary');
-            debugger;
-
+            showInventory(id)
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
             showItems(id);
@@ -270,6 +269,39 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
+    function showInventory(id) {
+        fetchRails(`${inventoriesUrl}`)
+        .then(function(inventoryItems){
+            let inventoryContainer = document.createElement(`div`)
+            inventoryContainer.className = `inventory-container`
+            inventoryItems.forEach(function(inventoryItem){
+                if (inventoryItem.user_id === parseInt(id)) {
+                    // go into items database.
+                    fetch(itemsurl).then(resp => resp.json()).then(function(results){
+                        results.forEach (function(item){
+                            if (item.id === inventoryItem.item_id){
+                                let inventoryTile = document.createElement(`div`)
+                                inventoryTile.className = `inventory-tile`
+                                inventoryTile.innerHTML = `
+                                <img src=${item.img_url}>
+                                <p>${item.name}<br>
+                                ${item.description}<br>
+                                Quantity: ${inventoryItem.quantity}</p>
+                                `
+                                let summonBtn = document.createElement(`button`)
+                                    summonBtn.setAttribute('class', 'summon-button')
+                                    summonBtn.dataset.itemId = item.id
+                                    summonBtn.textContent = 'Summon!'
+                                    inventoryTile.append(summonBtn)
+                                inventoryContainer.append(inventoryTile)                                
+                            }                            
+                        }) 
+                    })
+                }
+            })
+            document.body.append(inventoryContainer)
+        })
+    }
     function showItems(id) {
         fetchRails(itemsurl)
         .then(function(items){
