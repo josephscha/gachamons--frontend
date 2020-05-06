@@ -6,10 +6,12 @@ const summonsUrl = 'http://localhost:3000/summons';
 let allMons = []//stroe all monsters
 
 document.addEventListener('DOMContentLoaded', function () {
+
     const requestHeaders = {
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
+
 
     function getMonsArr() {
         fetchRails(monstersUrl)
@@ -245,13 +247,15 @@ document.addEventListener('DOMContentLoaded', function () {
             showUser(id);
         } else if (eventTarget.className === 'nav-monsters') {
             clearPage();
-
+            renderUserMonsters(id);
         } else if (eventTarget.className === 'nav-inventory') {
             clearPage();
+
             // let normalMons = filterMons(allMons, 'normal');
             // let epicMons = filterMons(allMons, 'epic');
             // let legendaryMons = filterMons(allMons, 'legendary');
             showInventory(id)
+
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
@@ -272,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
             navBar.style.display = 'none';
         }
     })
+
 
     function showInventory(id) {
         fetchRails(`${inventoriesUrl}`)
@@ -380,45 +385,67 @@ document.addEventListener('DOMContentLoaded', function () {
         return Math.floor(Math.random() * Math.floor(max));
     }
 
+    function renderUserMonsters(userId) {
+        fetchRails(summonsUrl)
+            .then(function (array) {
+                let userMonsters = document.createElement('div')
+                userMonsters.setAttribute('class', 'user-monsters-container')
+                document.body.append(userMonsters)
+                array.forEach(function (summon) {
+                    if (summon['user_id'] === parseInt(userId)) {
+                        let monsterId = summon['monster_id']
+                        fetchRails(`${monstersUrl}/${monsterId}`)
+                        .then(function(result){
+                            let div = showMonster(result)
+                            userMonsters.append(div)
+                        })
+                    }
+                })
+            })
+    }
+
+
+
+
     function showItems(id) {
         fetchRails(itemsurl)
             .then(function (items) {
                 let itemContainer = document.createElement('div')
                 itemContainer.setAttribute('class', 'egg-container')
                 document.body.append(itemContainer);
-                fetch(`${ usersUrl } /${id}`)
-                                .then(res => res.json())
-                                .then(function (res) {
+                fetch(`${usersUrl}/${id}`)
+                    .then(res => res.json())
+                    .then(function (res) {
 
-                                    balance = res['balance'];
-                                    itemContainer.innerHTML = `
+                        balance = res['balance'];
+                        itemContainer.innerHTML = `
               <h1>Balance: ${balance}</h1>
               `
-                                    items.forEach(function (item) {
-                                        let div = displayEgg(item);
-                                        itemContainer.append(div);
-                                    })
-                                })
-                            //debugger;
+                        items.forEach(function (item) {
+                            let div = displayEgg(item);
+                            itemContainer.append(div);
                         })
-                }
+                    })
+                //debugger;
+            })
+    }
+
 
     function displayEgg(item) {
                         let div = document.createElement('div')
+        let buyBtn = document.createElement('button')
+        buyBtn.setAttribute('class', 'buy-button')
+        buyBtn.dataset.itemId = item.id
+        buyBtn.textContent = 'Buy'
 
-                        let buyBtn = document.createElement('button')
-                        buyBtn.setAttribute('class', 'buy-button')
-                        buyBtn.dataset.itemId = item.id
-                        buyBtn.textContent = 'Buy'
+        // let summonBtn = document.createElement('button')
+        // summonBtn.setAttribute('class', 'summon-button')
+        // summonBtn.dataset.itemId = item.id
+        // summonBtn.textContent = 'Summon!'
 
-                        // let summonBtn = document.createElement('button')
-                        // summonBtn.setAttribute('class', 'summon-button')
-                        // summonBtn.dataset.itemId = item.id
-                        // summonBtn.textContent = 'Summon!'
-
-                        div.setAttribute('class', 'item-tile')
-                        div.dataset.itemId = item.id;
-                        div.innerHTML = `
+        div.setAttribute('class', 'item-tile')
+        div.dataset.itemId = item.id;
+        div.innerHTML = `
         <img src=${item['img_url']}>
         <p>Name: ${item.name}, Price: ${item.price} <br>
         ${item['description']}</p>
@@ -430,10 +457,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //fetch data from rails api, here using GET method only
     function fetchRails(url) {
-                        return fetch(url)
-                            .then(res => res.json())
-                            .then(result => result)
-                    }
+        return fetch(url)
+            .then(res => res.json())
+            .then(result => result)
+    }
+
 
 
     function getMonsters() {
@@ -455,16 +483,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         div.setAttribute('class', 'monster-tile')
                         div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
-        <p>${monster.name}, rarity ${monster.rarity}</p>
+        <p>${monster.name}, rarity: ${monster.rarity}</p>
         `
                         return div;
                     }
 
     function clearPage() {
-                        //let children = Array.from(document.body.children);
-                        navBar = document.querySelector('.nav-bar');
-                        document.body.innerHTML = ``;
-                        document.body.append(navBar);
-                        return navBar;
-                    }
+        //let children = Array.from(document.body.children);
+        navBar = document.querySelector('.nav-bar');
+        document.body.innerHTML = ``;
+        document.body.append(navBar);
+        return navBar;
+    }
 })
