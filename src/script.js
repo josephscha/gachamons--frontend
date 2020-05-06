@@ -7,14 +7,14 @@ let allMons = []//stroe all monsters
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    
+
     function getMonsArr() {
         fetchRails(monstersUrl)
-        .then(function(result){
-            result.forEach(function(mon){
-                allMons.push(mon);
+            .then(function (result) {
+                result.forEach(function (mon) {
+                    allMons.push(mon);
+                })
             })
-        })
     }
 
     function filterMons(arr, rarity) {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].rarity === rarity) {
                 result.push(arr[i]);
-            } 
+            }
         }
         return result;
     }
@@ -232,29 +232,29 @@ document.addEventListener('DOMContentLoaded', function () {
     navBar.addEventListener('click', function (event) {
         let eventTarget = event.target;
         let id = eventTarget.parentNode.dataset.userId;
-        
+
         if (eventTarget.className === 'nav-monsters-collection') {
             clearPage();
             getMonsters();
-            
-        } else if (eventTarget.className === 'nav-profile'){
+
+        } else if (eventTarget.className === 'nav-profile') {
             clearPage();
             showUser(id);
         } else if (eventTarget.className === 'nav-monsters') {
             clearPage();
-
+            renderUserMonsters(id);
         } else if (eventTarget.className === 'nav-inventory') {
             clearPage();
-            let normalMons  = filterMons(allMons, 'normal');
-            let epicMons  = filterMons(allMons, 'epic');
-            let legendaryMons  = filterMons(allMons, 'legendary');
+            let normalMons = filterMons(allMons, 'normal');
+            let epicMons = filterMons(allMons, 'epic');
+            let legendaryMons = filterMons(allMons, 'legendary');
             debugger;
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
             showItems(id);
 
-            
+
             //after bought an item, substract the balance
             //add listener to buy and summon button
 
@@ -263,34 +263,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-logout') {
             document.body.innerHTML = ``;
-            homePage.forEach(function(div){
+            homePage.forEach(function (div) {
                 document.body.append(div);
             })
             navBar.style.display = 'none';
         }
     })
 
+    function renderUserMonsters(userId) {
+        fetchRails(summonsUrl)
+            .then(function (array) {
+                let userMonsters = document.createElement('div')
+                userMonsters.setAttribute('class', 'user-monsters-container')
+                document.body.append(userMonsters)
+                array.forEach(function (summon) {
+                    if (summon['user_id'] === parseInt(userId)) {
+                        let monsterId = summon['monster_id']
+                        fetchRails(`${monstersUrl}/${monsterId}`)
+                        .then(function(result){
+                            let div = showMonster(result)
+                            userMonsters.append(div)
+                        })
+                    }
+                })
+            })
+    }
+
+
+
     function showItems(id) {
         fetchRails(itemsurl)
-        .then(function(items){
-            let itemContainer = document.createElement('div')
-            itemContainer.setAttribute('class', 'egg-container')
-            document.body.append(itemContainer);
-            fetch(`${usersUrl}/${id}`)
-            .then(res => res.json())
-            .then(function(res){
-                
-              balance = res['balance'];
-              itemContainer.innerHTML = `
+            .then(function (items) {
+                let itemContainer = document.createElement('div')
+                itemContainer.setAttribute('class', 'egg-container')
+                document.body.append(itemContainer);
+                fetch(`${usersUrl}/${id}`)
+                    .then(res => res.json())
+                    .then(function (res) {
+
+                        balance = res['balance'];
+                        itemContainer.innerHTML = `
               <h1>Balance: ${balance}</h1>
               `
-              items.forEach(function(item){
-                let div = displayEgg(item);
-                itemContainer.append(div);
+                        items.forEach(function (item) {
+                            let div = displayEgg(item);
+                            itemContainer.append(div);
+                        })
+                    })
+                //debugger;
             })
-            }) 
-            //debugger;
-        })
     }
 
     function displayEgg(item) {
@@ -300,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
         buyBtn.setAttribute('class', 'buy-button')
         buyBtn.dataset.itemId = item.id
         buyBtn.textContent = 'Buy'
-        
+
         // let summonBtn = document.createElement('button')
         // summonBtn.setAttribute('class', 'summon-button')
         // summonBtn.dataset.itemId = item.id
@@ -321,8 +342,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //fetch data from rails api, here using GET method only
     function fetchRails(url) {
         return fetch(url)
-        .then(res => res.json())
-        .then(result => result)
+            .then(res => res.json())
+            .then(result => result)
     }
 
 
@@ -345,12 +366,12 @@ document.addEventListener('DOMContentLoaded', function () {
         div.setAttribute('class', 'monster-tile')
         div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
-        <p>${monster.name}, level ${monster.level}</p>
+        <p>${monster.name}, rarity: ${monster.rarity}</p>
         `
         return div;
     }
 
-    function clearPage() {      
+    function clearPage() {
         //let children = Array.from(document.body.children);
         navBar = document.querySelector('.nav-bar');
         document.body.innerHTML = ``;
