@@ -6,16 +6,18 @@ const summonsUrl = 'http://localhost:3000/summons';
 let allMons = []//stroe all monsters
 
 document.addEventListener('DOMContentLoaded', function () {
-    const requestHeaders = { "Content-Type": "application/json",
-    "Accept": "application/json"}
-    
+    const requestHeaders = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+
     function getMonsArr() {
         fetchRails(monstersUrl)
-        .then(function(result){
-            result.forEach(function(mon){
-                allMons.push(mon);
+            .then(function (result) {
+                result.forEach(function (mon) {
+                    allMons.push(mon);
+                })
             })
-        })
     }
 
     function filterMons(arr, rarity) {
@@ -23,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].rarity === rarity) {
                 result.push(arr[i]);
-            } 
+            }
         }
         return result;
     }
@@ -233,12 +235,12 @@ document.addEventListener('DOMContentLoaded', function () {
     navBar.addEventListener('click', function (event) {
         let eventTarget = event.target;
         let id = eventTarget.parentNode.dataset.userId;
-        
+
         if (eventTarget.className === 'nav-monsters-collection') {
             clearPage();
             getMonsters();
-            
-        } else if (eventTarget.className === 'nav-profile'){
+
+        } else if (eventTarget.className === 'nav-profile') {
             clearPage();
             showUser(id);
         } else if (eventTarget.className === 'nav-monsters') {
@@ -246,16 +248,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-inventory') {
             clearPage();
-            let normalMons  = filterMons(allMons, 'normal');
-            let epicMons  = filterMons(allMons, 'epic');
-            let legendaryMons  = filterMons(allMons, 'legendary');
+            let normalMons = filterMons(allMons, 'normal');
+            let epicMons = filterMons(allMons, 'epic');
+            let legendaryMons = filterMons(allMons, 'legendary');
             showInventory(id)
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
             showItems(id);
 
-            
+
             //after bought an item, substract the balance
             //add listener to buy and summon button
 
@@ -264,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-logout') {
             document.body.innerHTML = ``;
-            homePage.forEach(function(div){
+            homePage.forEach(function (div) {
                 document.body.append(div);
             })
             navBar.style.display = 'none';
@@ -273,78 +275,87 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showInventory(id) {
         fetchRails(`${inventoriesUrl}`)
-        .then(function(inventoryItems){
-            let inventoryContainer = document.createElement(`div`)
-            inventoryContainer.className = `inventory-container`
-            inventoryItems.forEach(function(inventoryItem){
-                if (inventoryItem.user_id === parseInt(id)) {
-                    // go into items database.
-                    fetch(itemsurl).then(resp => resp.json()).then(function(results){
-                        results.forEach (function(item){
-                            if (item.id === inventoryItem.item_id){
-                                let inventoryTile = document.createElement(`div`)
-                                inventoryTile.className = `inventory-tile`
-                                inventoryTile.innerHTML = `
+            .then(function (inventoryItems) {
+                let inventoryContainer = document.createElement(`div`)
+                inventoryContainer.className = `inventory-container`
+                document.body.append(inventoryContainer)
+                inventoryItems.forEach(function (inventoryItem) {
+                    if (inventoryItem.user_id === parseInt(id)) {
+                        // go into items database.
+                        fetch(itemsurl).then(resp => resp.json()).then(function (results) {
+                            results.forEach(function (item) {
+                                if (item.id === inventoryItem.item_id) {
+                                    let inventoryTile = document.createElement(`div`)
+                                    inventoryTile.className = `inventory-tile`
+                                    inventoryTile.innerHTML = `
                                 <img src=${item.img_url}>
                                 <p>${item.name}<br>
                                 ${item.description}<br>
                                 Quantity: ${inventoryItem.quantity}</p>
                                 `
-                                let summonBtn = document.createElement(`button`)
-                                summonBtn.setAttribute('class', 'summon-button')
-                                summonBtn.dataset.itemId = item.id
-                                summonBtn.textContent = 'Summon!'
-                                inventoryTile.append(summonBtn)
-                                inventoryContainer.append(inventoryTile)
-                                inventoryItemId = inventoryItem.id
-                                user_id = parseInt(id)
-                                item_id = item.id
-                                quantity = parseInt(inventoryItem.quantity) - 1
-                                updatedInventoryItem = {user_id, item_id, quantity}
-                                // add eventlistener to summonBtn
-                                // send patch request to current item
-                                // decrement quantity by 1, if quantity = 0, delete 
-                                // send post request to summons 
-                                // summonBtn.addEventListener(`click`, function(event){
-                                //     fetch(`${inventoriesUrl}/${inventoryItemId}`, {
-                                //         method: `PATCH`,
-                                //         headers: requestHeaders,
-                                //         body: JSON.stringify(updatedInventoryItem)
-                                //     }).then(res => res.json())
-                                //     .then(newInventoryItem => {
-                                        
-                                //     })
-                                // })                                
-                            }                            
-                        }) 
-                    })
-                }
+                                    let summonBtn = document.createElement(`button`)
+                                    summonBtn.setAttribute('class', 'summon-button')
+                                    summonBtn.dataset.inventoryId = inventoryItem.id
+                                    summonBtn.dataset.itemId = item.id
+                                    summonBtn.dataset.quantity = inventoryItem.quantity
+                                    summonBtn.textContent = 'Summon!'
+                                    inventoryTile.append(summonBtn)
+                                    inventoryContainer.append(inventoryTile)
+                                    // inventoryItemId = inventoryItem.id
+                                    // user_id = parseInt(id)
+                                    // item_id = item.id
+                                    // add eventlistener to summonBtn
+                                    // debugger;
+                                    // send patch request to current inventory object
+                                    // decrement quantity by 1, if quantity = 0, delete 
+                                    // render updated inventoryitem
+                                    // if summonBtn.dataset.id = 1, go into normalMons and pull out random object
+                                    // if id = 2, Epicmons
+                                    // if id = 3, LegendaryMons
+                                    // send post request to summons with pulled out object
+                                    
+                                    summonBtn.addEventListener(`click`, function (event) {
+                                        newQuantity = parseInt(event.target.dataset.quantity) - 1
+                                        updatedInventoryItem = { "user_id": parseInt(navBar.dataset.userId), "item_id": parseInt(event.target.dataset.itemId), "quantity": newQuantity }
+                                        event.target.dataset.quantity = newQuantity
+                                        fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
+                                            method: "PATCH",
+                                            headers: requestHeaders,
+                                            body: JSON.stringify(updatedInventoryItem)
+                                        }).then(res => res.json())
+                                        .then(function (result) {
+                                            // function here to render the summoned monster
+                                        })
+                                    })
+                                }
+                            })
+                        })
+                    }
+                })
             })
-            document.body.append(inventoryContainer)
-        })
     }
 
     function showItems(id) {
         fetchRails(itemsurl)
-        .then(function(items){
-            let itemContainer = document.createElement('div')
-            itemContainer.setAttribute('class', 'egg-container')
-            document.body.append(itemContainer);
-            fetch(`${usersUrl}/${id}`)
-            .then(res => res.json())
-            .then(function(res){
-                
-              balance = res['balance'];
-              itemContainer.innerHTML = `
+            .then(function (items) {
+                let itemContainer = document.createElement('div')
+                itemContainer.setAttribute('class', 'egg-container')
+                document.body.append(itemContainer);
+                fetch(`${usersUrl}/${id}`)
+                    .then(res => res.json())
+                    .then(function (res) {
+
+                        balance = res['balance'];
+                        itemContainer.innerHTML = `
               <h1>Balance: ${balance}</h1>
               `
-              items.forEach(function(item){
-                let div = displayEgg(item);
-                itemContainer.append(div);
+                        items.forEach(function (item) {
+                            let div = displayEgg(item);
+                            itemContainer.append(div);
+                        })
+                    })
+                //debugger;
             })
-            }) 
-            //debugger;
-        })
     }
 
     function displayEgg(item) {
@@ -354,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
         buyBtn.setAttribute('class', 'buy-button')
         buyBtn.dataset.itemId = item.id
         buyBtn.textContent = 'Buy'
-        
+
         // let summonBtn = document.createElement('button')
         // summonBtn.setAttribute('class', 'summon-button')
         // summonBtn.dataset.itemId = item.id
@@ -375,8 +386,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //fetch data from rails api, here using GET method only
     function fetchRails(url) {
         return fetch(url)
-        .then(res => res.json())
-        .then(result => result)
+            .then(res => res.json())
+            .then(result => result)
     }
 
 
@@ -404,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return div;
     }
 
-    function clearPage() {      
+    function clearPage() {
         //let children = Array.from(document.body.children);
         navBar = document.querySelector('.nav-bar');
         document.body.innerHTML = ``;
