@@ -1,9 +1,32 @@
 const monstersUrl = 'http://127.0.0.1:3000/monsters';
 const usersUrl = 'http://localhost:3000/users';
 const itemsurl = 'http://localhost:3000/items';
+const inventoriesUrl = 'http://localhost:3000/inventories';
+const summonsUrl = 'http://localhost:3000/summons';
+let allMons = []//stroe all monsters
 
 
 document.addEventListener('DOMContentLoaded', function () {
+    
+    function getMonsArr() {
+        fetchRails(monstersUrl)
+        .then(function(result){
+            result.forEach(function(mon){
+                allMons.push(mon);
+            })
+        })
+    }
+
+    function filterMons(arr, rarity) {
+        let result = [];
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].rarity === rarity) {
+                result.push(arr[i]);
+            } 
+        }
+        return result;
+    }
+    getMonsArr();
 
     const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
     let navBar = document.querySelector('.nav-bar');
@@ -212,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (eventTarget.className === 'nav-monsters-collection') {
             clearPage();
             getMonsters();
+            
         } else if (eventTarget.className === 'nav-profile'){
             clearPage();
             showUser(id);
@@ -220,10 +244,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-inventory') {
             clearPage();
+            let normalMons  = filterMons(allMons, 'normal');
+            let epicMons  = filterMons(allMons, 'epic');
+            let legendaryMons  = filterMons(allMons, 'legendary');
+            debugger;
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
             showItems();
+
+            
             //after bought an item, substract the balance
             //add listener to buy and summon button
 
@@ -261,10 +291,10 @@ document.addEventListener('DOMContentLoaded', function () {
         buyBtn.dataset.itemId = item.id
         buyBtn.textContent = 'Buy'
         
-        let summonBtn = document.createElement('button')
-        summonBtn.setAttribute('class', 'summon-button')
-        summonBtn.dataset.itemId = item.id
-        summonBtn.textContent = 'Summon!'
+        // let summonBtn = document.createElement('button')
+        // summonBtn.setAttribute('class', 'summon-button')
+        // summonBtn.dataset.itemId = item.id
+        // summonBtn.textContent = 'Summon!'
 
         div.setAttribute('class', 'item-tile')
         div.dataset.itemId = item.id;
@@ -274,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ${item['description']}</p>
         `
         div.append(buyBtn);
-        div.append(summonBtn);
+        // div.append(summonBtn);
         return div;
     }
 
