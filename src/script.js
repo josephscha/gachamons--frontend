@@ -5,8 +5,9 @@ const inventoriesUrl = 'http://localhost:3000/inventories';
 const summonsUrl = 'http://localhost:3000/summons';
 let allMons = []//stroe all monsters
 
-
 document.addEventListener('DOMContentLoaded', function () {
+    const requestHeaders = { "Content-Type": "application/json",
+    "Accept": "application/json"}
     
     function getMonsArr() {
         fetchRails(monstersUrl)
@@ -249,6 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let epicMons  = filterMons(allMons, 'epic');
             let legendaryMons  = filterMons(allMons, 'legendary');
             showInventory(id)
+
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
             showItems(id);
@@ -289,11 +291,30 @@ document.addEventListener('DOMContentLoaded', function () {
                                 Quantity: ${inventoryItem.quantity}</p>
                                 `
                                 let summonBtn = document.createElement(`button`)
-                                    summonBtn.setAttribute('class', 'summon-button')
-                                    summonBtn.dataset.itemId = item.id
-                                    summonBtn.textContent = 'Summon!'
-                                    inventoryTile.append(summonBtn)
-                                inventoryContainer.append(inventoryTile)                                
+                                summonBtn.setAttribute('class', 'summon-button')
+                                summonBtn.dataset.itemId = item.id
+                                summonBtn.textContent = 'Summon!'
+                                inventoryTile.append(summonBtn)
+                                inventoryContainer.append(inventoryTile)
+                                inventoryItemId = inventoryItem.id
+                                user_id = parseInt(id)
+                                item_id = item.id
+                                quantity = parseInt(inventoryItem.quantity) - 1
+                                updatedInventoryItem = {user_id, item_id, quantity}
+                                // add eventlistener to summonBtn
+                                // send patch request to current item
+                                // decrement quantity by 1, if quantity = 0, delete 
+                                // send post request to summons 
+                                // summonBtn.addEventListener(`click`, function(event){
+                                //     fetch(`${inventoriesUrl}/${inventoryItemId}`, {
+                                //         method: `PATCH`,
+                                //         headers: requestHeaders,
+                                //         body: JSON.stringify(updatedInventoryItem)
+                                //     }).then(res => res.json())
+                                //     .then(newInventoryItem => {
+                                        
+                                //     })
+                                // })                                
                             }                            
                         }) 
                     })
@@ -302,6 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.append(inventoryContainer)
         })
     }
+
     function showItems(id) {
         fetchRails(itemsurl)
         .then(function(items){
