@@ -1,5 +1,6 @@
 const monstersUrl = 'http://127.0.0.1:3000/monsters';
 const usersUrl = 'http://localhost:3000/users';
+const itemsurl = 'http://localhost:3000/items';
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -199,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(newUser)
             }).then(res => res.json())
                 .then(function (result) {
+                    clearPage();
                     showUser(result.id);
                 })
         })
@@ -221,6 +223,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
+            showItems();
+            //after bought an item, substract the balance
+            //add listener to buy and summon button
 
         } else if (eventTarget.className === 'nav-balance') {
             clearPage();
@@ -233,6 +238,52 @@ document.addEventListener('DOMContentLoaded', function () {
             navBar.style.display = 'none';
         }
     })
+
+    function showItems() {
+        fetchRails(itemsurl)
+        .then(function(items){
+            let itemContainer = document.createElement('div')
+            itemContainer.setAttribute('class', 'egg-container')
+            document.body.append(itemContainer);
+
+            items.forEach(function(item){
+                let div = displayEgg(item);
+                itemContainer.append(div);
+            })
+        })
+    }
+
+    function displayEgg(item) {
+        let div = document.createElement('div')
+
+        let buyBtn = document.createElement('button')
+        buyBtn.setAttribute('class', 'buy-button')
+        buyBtn.dataset.itemId = item.id
+        buyBtn.textContent = 'Buy'
+        
+        let summonBtn = document.createElement('button')
+        summonBtn.setAttribute('class', 'summon-button')
+        summonBtn.dataset.itemId = item.id
+        summonBtn.textContent = 'Summon!'
+
+        div.setAttribute('class', 'item-tile')
+        div.dataset.itemId = item.id;
+        div.innerHTML = `
+        <img src=${item['img_url']}>
+        <p>Name: ${item.name}, Price: ${item.price} <br>
+        ${item['description']}</p>
+        `
+        div.append(buyBtn);
+        div.append(summonBtn);
+        return div;
+    }
+
+    //fetch data from rails api, here using GET method only
+    function fetchRails(url) {
+        return fetch(url)
+        .then(res => res.json())
+        .then(result => result)
+    }
 
 
     function getMonsters() {
