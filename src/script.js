@@ -5,8 +5,13 @@ const inventoriesUrl = 'http://localhost:3000/inventories';
 const summonsUrl = 'http://localhost:3000/summons';
 let allMons = []//stroe all monsters
 
-
 document.addEventListener('DOMContentLoaded', function () {
+
+    const requestHeaders = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+
 
     function getMonsArr() {
         fetchRails(monstersUrl)
@@ -245,10 +250,12 @@ document.addEventListener('DOMContentLoaded', function () {
             renderUserMonsters(id);
         } else if (eventTarget.className === 'nav-inventory') {
             clearPage();
-            let normalMons = filterMons(allMons, 'normal');
-            let epicMons = filterMons(allMons, 'epic');
-            let legendaryMons = filterMons(allMons, 'legendary');
-            debugger;
+
+            // let normalMons = filterMons(allMons, 'normal');
+            // let epicMons = filterMons(allMons, 'epic');
+            // let legendaryMons = filterMons(allMons, 'legendary');
+            showInventory(id)
+
 
         } else if (eventTarget.className === 'nav-shop') {
             clearPage();
@@ -270,6 +277,114 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
+
+    function showInventory(id) {
+        fetchRails(`${inventoriesUrl}`)
+            .then(inventoryItems => renderInventoryPage(inventoryItems, id))
+    }
+
+    function renderInventoryPage(inventoryItems, id) {
+        let inventoryContainer = document.createElement(`div`)
+        inventoryContainer.className = `inventory-container`
+        document.body.append(inventoryContainer)
+        inventoryItems.forEach(function (inventoryItem) {
+            if (inventoryItem.user_id === parseInt(id)) {
+                // go into items database.
+                fetch(itemsurl).then(resp => resp.json()).then(function (results) {
+                    results.forEach(function (item) {
+                        if (item.id === inventoryItem.item_id) {
+                            if (parseInt(inventoryItem.quantity) !== 0) {
+                                let inventoryTile = document.createElement(`div`)
+                                inventoryTile.className = `inventory-tile`
+                                inventoryTile.innerHTML = `
+                    <img src=${item.img_url}>
+                    <p>${item.name}<br>
+                    ${item.description}<br>
+                    Quantity: ${inventoryItem.quantity}</p>
+                    `
+                                let summonBtn = document.createElement(`button`)
+                                summonBtn.setAttribute('class', 'summon-button')
+                                summonBtn.dataset.inventoryId = inventoryItem.id
+                                summonBtn.dataset.itemId = item.id
+                                summonBtn.dataset.quantity = inventoryItem.quantity
+                                summonBtn.dataset.itemName = item.name
+                                summonBtn.textContent = 'Summon!'
+                                inventoryTile.append(summonBtn)
+                                inventoryContainer.append(inventoryTile)
+                                // inventoryItemId = inventoryItem.id
+                                // user_id = parseInt(id)
+                                // item_id = item.id
+                                // add eventlistener to summonBtn
+                                // debugger;
+                                // send patch request to current inventory object
+                                // decrement quantity by 1, if quantity = 0, delete 
+                                // render updated inventoryitem
+                                // if summonBtn.dataset.id = 1, go into normalMons and pull out random object
+                                // if id = 2, Epicmons
+                                // if id = 3, LegendaryMons
+                                // send post request to summons with pulled out object
+                            }
+                        }
+                    })
+                })
+            }
+        })
+    }
+    document.body.addEventListener("click", function (event) {
+        if (event.target.className === "summon-button") {
+            clearPage()
+            newQuantity = parseInt(event.target.dataset.quantity) - 1
+            updatedInventoryItem = { "user_id": parseInt(navBar.dataset.userId), "item_id": parseInt(event.target.dataset.itemId), "quantity": newQuantity }
+            event.target.dataset.quantity = newQuantity
+            let monster = summonMonster(event.target.dataset.itemName)
+            let summonedMonster = showMonster(monster)
+            addMonsterToDatabase(monster)
+            summonedMonster.setAttribute("id", "summoned-monster")
+            document.body.append(summonedMonster)
+            fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
+                method: "PATCH",
+                headers: requestHeaders,
+                body: JSON.stringify(updatedInventoryItem)
+            }).then(res => res.json())
+                .then(result => showInventory(parseInt(navBar.dataset.userId)))
+        }
+    })
+
+    function summonMonster(itemName){
+        if (itemName === "Tamago"){
+            normalMons = filterMons(allMons, "normal")
+            let maxNum = normalMons.length - 1
+            let monster = normalMons[getRandomInt(maxNum)]
+            return monster
+        }
+        else if (itemName === "Lady Egga"){
+            let epicMons = filterMons(allMons, "epic")
+            let maxNum = epicMons.length - 1
+            let monster = epicMons[getRandomInt(maxNum)]
+            return monster
+        }
+        else {
+            let legendaryMons = filterMons(allMons, "legendary")
+            let maxNum = legendaryMons.length - 1
+            let monster = legendaryMons[getRandomInt(maxNum)]
+            return monster
+        }
+    }
+
+    function addMonsterToDatabase(monsterObj) {
+        let newSummon = {"user_id": parseInt(navBar.dataset.userId), "monster_id": monsterObj.id}
+        debugger;
+        fetch(summonsUrl, {
+            method: "POST",
+            headers: requestHeaders,
+            body: JSON.stringify(newSummon)
+        })
+    }
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
+
     function renderUserMonsters(userId) {
         fetchRails(summonsUrl)
             .then(function (array) {
@@ -288,6 +403,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
             })
     }
+
 
 
 
@@ -314,9 +430,9 @@ document.addEventListener('DOMContentLoaded', function () {
             })
     }
 
-    function displayEgg(item) {
-        let div = document.createElement('div')
 
+    function displayEgg(item) {
+                        let div = document.createElement('div')
         let buyBtn = document.createElement('button')
         buyBtn.setAttribute('class', 'buy-button')
         buyBtn.dataset.itemId = item.id
@@ -334,10 +450,10 @@ document.addEventListener('DOMContentLoaded', function () {
         <p>Name: ${item.name}, Price: ${item.price} <br>
         ${item['description']}</p>
         `
-        div.append(buyBtn);
-        // div.append(summonBtn);
-        return div;
-    }
+                        div.append(buyBtn);
+                        // div.append(summonBtn);
+                        return div;
+                    }
 
     //fetch data from rails api, here using GET method only
     function fetchRails(url) {
@@ -347,29 +463,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
+
     function getMonsters() {
-        fetch(monstersUrl)
-            .then(res => res.json())
-            .then(function (result) {
-                let monsterContainer = document.createElement('div')
-                document.body.append(monsterContainer);
-                monsterContainer.setAttribute('class', 'monster-container');
-                result.forEach(function (monster) {
-                    let div = showMonster(monster)
-                    monsterContainer.append(div);
-                })
-            })
-    }
+                        fetch(monstersUrl)
+                            .then(res => res.json())
+                            .then(function (result) {
+                                let monsterContainer = document.createElement('div')
+                                document.body.append(monsterContainer);
+                                monsterContainer.setAttribute('class', 'monster-container');
+                                result.forEach(function (monster) {
+                                    let div = showMonster(monster)
+                                    monsterContainer.append(div);
+                                })
+                            })
+                    }
 
     function showMonster(monster) {
-        let div = document.createElement('div')
-        div.setAttribute('class', 'monster-tile')
-        div.innerHTML = `
+                        let div = document.createElement('div')
+                        div.setAttribute('class', 'monster-tile')
+                        div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
         <p>${monster.name}, rarity: ${monster.rarity}</p>
         `
-        return div;
-    }
+                        return div;
+                    }
 
     function clearPage() {
         //let children = Array.from(document.body.children);
