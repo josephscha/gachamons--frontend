@@ -347,6 +347,22 @@ document.addEventListener('DOMContentLoaded', function () {
             }).then(res => res.json())
                 .then(result => showInventory(parseInt(navBar.dataset.userId)))
         }
+        else if (event.target.className === "buy-button") {
+            clearPage()
+            // when user clicks buy button, check inventory to see if user has the item
+            // if user HAS item, increment quantity by 1 (PATCH)
+            // if user does NOT have item, create (POST)
+            fetch(inventoriesUrl)
+            .then(resp => resp.json())
+            .then
+            // LEFT OFF HERE
+            fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
+                method: "PATCH",
+                headers: requestHeaders,
+                body: JSON.stringify(updatedInventoryItem)
+            }).then(res => res.json())
+                .then(result => showInventory(parseInt(navBar.dataset.userId)))
+        }
     })
 
     function summonMonster(itemName) {
