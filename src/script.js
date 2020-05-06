@@ -333,6 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
             event.target.dataset.quantity = newQuantity
             let monster = summonMonster(event.target.dataset.itemName)
             let summonedMonster = showMonster(monster)
+            addMonsterToDatabase(monster)
             summonedMonster.setAttribute("id", "summoned-monster")
             document.body.append(summonedMonster)
             fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
@@ -363,6 +364,16 @@ document.addEventListener('DOMContentLoaded', function () {
             let monster = legendaryMons[getRandomInt(maxNum)]
             return monster
         }
+    }
+
+    function addMonsterToDatabase(monsterObj) {
+        let newSummon = {"user_id": parseInt(navBar.dataset.userId), "monster_id": monsterObj.id}
+        debugger;
+        fetch(summonsUrl, {
+            method: "POST",
+            headers: requestHeaders,
+            body: JSON.stringify(newSummon)
+        })
     }
 
     function getRandomInt(max) {
