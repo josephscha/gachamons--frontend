@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-balance') {
             clearPage();
-
+            showAddBalancePage(id)
         } else if (eventTarget.className === 'nav-logout') {
             document.body.innerHTML = ``;
             homePage.forEach(function (div) {
@@ -279,7 +279,62 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
+    function showAddBalancePage(userId) {
+        getUser(userId)
+    }
 
+    function getUser(userId) {
+        fetch(`${usersUrl}/${userId}`)
+            .then(resp => resp.json()).then(result => {
+                renderBalancePage(result)
+            })
+    }
+
+    function renderBalancePage(userObject) {
+        clearPage()
+        let div = document.createElement(`div`)
+        div.setAttribute("class", "balance-page")
+        div.dataset.userBalance = userObject.balance
+        div.innerHTML = `
+        <h1>Current Balance : ONLY ${userObject.balance} Credits </h1><br>
+        <h2>1 USD = 1,000 In game credits!</h2><br>
+        <form id='add-balance-form'><br>
+        <label for="balance">How much would you like to add?</label><br>
+        <input type="number" id="balance" name="balance" value=""><br>
+        <p>Full name as it appears on card</p>
+        <input type"text" name="fname" value=""><br>
+        <p>Please do not enter your credit card # here</p>
+        <input type="number" name="creditcardnumber" value=""><br>
+        <p>Social Security Number</p>
+        <input type="number" name="ssnumber" value=""<br>
+        <p>Mother's Maiden Name</p>
+        <input type="text" name="mothersmaidenname" value=""><br>
+        <input type="submit" value="Spend that money!">
+        `
+        document.body.append(div)
+        div.addEventListener("submit", function (event) {
+            event.preventDefault();
+            let id = parseInt(navBar.dataset.userId)
+            let balanceForm = event.target
+            let balance = parseInt(balanceForm.balance.value)
+            let userBalance = parseInt(event.target.parentNode.dataset.userBalance)
+            let newBalance = balance + userBalance
+            fetch(`${usersUrl}/${id}`, {
+                method: "PATCH",
+                headers: requestHeaders,
+                body: JSON.stringify({"balance": newBalance})
+            })
+                .then(resp => resp.json())
+                .then(userObject => {
+                    renderBalancePage(userObject)
+                })
+        })
+    }
+    function updateUserBalance(userObject) {
+        newBalance = userObject.balance + balance;
+        return newBalance
+
+    }
     function showInventory(id) {
         fetchRails(`${inventoriesUrl}`)
             .then(inventoryItems => renderInventoryPage(inventoryItems, id))
@@ -503,6 +558,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let buyBtn = document.createElement('button')
         buyBtn.setAttribute('class', 'buy-button')
         buyBtn.dataset.itemId = item.id
+        buyBtn.dataset.itemName = item.name
         buyBtn.textContent = 'Buy'
 
         // let summonBtn = document.createElement('button')
@@ -549,6 +605,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function showMonster(monster) {
         let div = document.createElement('div')
         div.setAttribute('class', 'monster-tile')
+        div.setAttribute('id', `${monster.rarity}`)
         div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
         <p>${monster.name}, rarity: ${monster.rarity}</p>
