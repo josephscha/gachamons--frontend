@@ -417,6 +417,13 @@ document.addEventListener('DOMContentLoaded', function () {
             <img src=${monster.img_url}>
             <p>Here is your new monster!</p>
             `
+            if (newQuantity > 0) {
+                let summonAnotherBtn = document.createElement(`button`)
+                summonAnotherBtn = event.target
+                summonAnotherBtn.dataset.quantity = newQuantity
+                summonAnotherBtn.textContent = "Summon another!"
+                summonedMonsterDiv.append(summonAnotherBtn)
+            }
             addMonsterToDatabase(monster)
             summonedMonsterDiv.setAttribute("id", `summoned-monster`)
             //render that summoning gif then replace node with summonedmonsterdiv
