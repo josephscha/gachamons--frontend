@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return result;
     }
-    
+
     getMons();
 
     const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
@@ -356,45 +356,6 @@ document.addEventListener('DOMContentLoaded', function () {
             let h1 = document.querySelector('.balance');
             let userId = parseInt(navBar.dataset.userId);
             let itemId = parseInt(event.target.dataset.itemId);
-            fetchRails(inventoriesUrl)
-            .then(function(result){
-                let flag = false;
-                let quantity = 1;
-                let id = 0;
-                for (let i = 0; i < result.length; i++) {
-                    if (result[i]['item_id'] === itemId && result[i]['user_id'] === userId) {
-                        flag = true;
-                        quantity = result[i]['quantity']
-                        id = result[i]['id']
-                    }
-                }
-                if (flag === true) {
-                    quantity += 1;                    
-                    //PATCH HERE
-                    let newObj = {
-                        "item_id": itemId,
-                        "user_id": userId,
-                        "quantity": quantity
-                    }
-                    fetch(`${inventoriesUrl}/${id}`, {
-                        method: 'PATCH',
-                        headers: requestHeaders, 
-                        body: JSON.stringify(newObj)
-                    })
-                }else {
-                    //POST HERE
-                    let newObj = {
-                        "item_id": itemId,
-                        "user_id": userId,
-                        "quantity": quantity
-                    }
-                    fetch(inventoriesUrl, {
-                        method: 'POST',
-                        headers: requestHeaders, 
-                        body: JSON.stringify(newObj)
-                    })
-                }
-            })          
             let itemPrice = parseInt(event.target.parentNode.dataset.price);
             let userBalance = parseInt(h1.dataset.balance);
             let newBalance = userBalance - itemPrice;
@@ -403,12 +364,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch(`${usersUrl}/${userId}`, {
                     method: 'PATCH',
                     headers: requestHeaders,
-                    body: JSON.stringify({'balance': newBalance})
+                    body: JSON.stringify({ 'balance': newBalance })
                 }).then(res => res.json())
-                .then(function(result){
-                    h1.dataset.balance = result['balance'];
-                    h1.innerHTML = `Balance: ${result['balance']}`;
-                })
+                    .then(function (result) {
+                        h1.dataset.balance = result['balance'];
+                        h1.innerHTML = `Balance: ${result['balance']}`;
+                    })
+                    fetchRails(inventoriesUrl)
+                    .then(function (result) {
+                        let flag = false;
+                        let quantity = 1;
+                        let id = 0;
+                        for (let i = 0; i < result.length; i++) {
+                            if (result[i]['item_id'] === itemId && result[i]['user_id'] === userId) {
+                                flag = true;
+                                quantity = result[i]['quantity']
+                                id = result[i]['id']
+                            }
+                        }
+                        if (flag === true) {
+                            quantity += 1;
+                            //PATCH HERE
+                            let newObj = {
+                                "item_id": itemId,
+                                "user_id": userId,
+                                "quantity": quantity
+                            }
+                            fetch(`${inventoriesUrl}/${id}`, {
+                                method: 'PATCH',
+                                headers: requestHeaders,
+                                body: JSON.stringify(newObj)
+                            })
+                        } else {
+                            //POST HERE
+                            let newObj = {
+                                "item_id": itemId,
+                                "user_id": userId,
+                                "quantity": quantity
+                            }
+                            fetch(inventoriesUrl, {
+                                method: 'POST',
+                                headers: requestHeaders,
+                                body: JSON.stringify(newObj)
+                            })
+                        }
+                    })
             } else {
                 alert('Not enough balance!')
             }
