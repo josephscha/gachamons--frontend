@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    function getMonsArr() {
+    function getMons() {
         fetchRails(monstersUrl)
             .then(function (result) {
                 result.forEach(function (mon) {
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
             })
     }
+
 
     function filterMons(arr, rarity) {
         let result = [];
@@ -31,7 +32,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return result;
     }
-    getMonsArr();
+
+    getMons();
 
     const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
     let navBar = document.querySelector('.nav-bar');
@@ -352,11 +354,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 let inventoryTile = document.createElement(`div`)
                                 inventoryTile.className = `inventory-tile`
                                 inventoryTile.innerHTML = `
-                    <img src=${item.img_url}>
-                    <p>${item.name}<br>
-                    ${item.description}<br>
-                    Quantity: ${inventoryItem.quantity}</p>
-                    `
+                                <img src=${item.img_url}>
+                                <p>${item.name}<br>
+                                ${item.description}<br>
+                                Quantity: ${inventoryItem.quantity}</p>
+                                `
                                 let summonBtn = document.createElement(`button`)
                                 summonBtn.setAttribute('class', 'summon-button')
                                 summonBtn.dataset.inventoryId = inventoryItem.id
@@ -406,61 +408,68 @@ document.addEventListener('DOMContentLoaded', function () {
             // when user clicks buy button, check inventory to see if user has the item
             // if user HAS item, increment quantity by 1 (PATCH)
             // if user does NOT have item, create (POST)
-            // debugger;
-            if (checkInventory(parseInt(event.target.dataset.itemId), parseInt(navBar.dataset.userId))) {
-
+            let h1 = document.querySelector('.balance');
+            let userId = parseInt(navBar.dataset.userId);
+            let itemId = parseInt(event.target.dataset.itemId);
+            let itemPrice = parseInt(event.target.parentNode.dataset.price);
+            let userBalance = parseInt(h1.dataset.balance);
+            let newBalance = userBalance - itemPrice;
+            if (newBalance >= 0) {
+                //make a PATCH to user/id
+                fetch(`${usersUrl}/${userId}`, {
+                    method: 'PATCH',
+                    headers: requestHeaders,
+                    body: JSON.stringify({ 'balance': newBalance })
+                }).then(res => res.json())
+                    .then(function (result) {
+                        h1.dataset.balance = result['balance'];
+                        h1.innerHTML = `Balance: ${result['balance']}`;
+                    })
+                    fetchRails(inventoriesUrl)
+                    .then(function (result) {
+                        let flag = false;
+                        let quantity = 1;
+                        let id = 0;
+                        for (let i = 0; i < result.length; i++) {
+                            if (result[i]['item_id'] === itemId && result[i]['user_id'] === userId) {
+                                flag = true;
+                                quantity = result[i]['quantity']
+                                id = result[i]['id']
+                            }
+                        }
+                        if (flag === true) {
+                            quantity += 1;
+                            //PATCH HERE
+                            let newObj = {
+                                "item_id": itemId,
+                                "user_id": userId,
+                                "quantity": quantity
+                            }
+                            fetch(`${inventoriesUrl}/${id}`, {
+                                method: 'PATCH',
+                                headers: requestHeaders,
+                                body: JSON.stringify(newObj)
+                            })
+                        } else {
+                            //POST HERE
+                            let newObj = {
+                                "item_id": itemId,
+                                "user_id": userId,
+                                "quantity": quantity
+                            }
+                            fetch(inventoriesUrl, {
+                                method: 'POST',
+                                headers: requestHeaders,
+                                body: JSON.stringify(newObj)
+                            })
+                        }
+                    })
+            } else {
+                alert('Not enough balance!')
             }
-            //     let newQuantity = inventory.quantity
-            //     newQuantity += 1;
-            //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
-            //     'item_id': parseInt(event.target.dataset.itemId), 
-            //     'quantity': newQuantity};
-            //     fetch(`${inventoriesUrl}/${inventory.id}`, {
-            //         method: 'PATCH',
-            //         headers: requestHeaders,
-            //         body: JSON.stringify(newInventory)
-            //     })
-            // } else {
-            //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
-            //     'item_id': parseInt(event.target.dataset.itemId), 
-            //     'quantity': 1};
-            //     fetch(inventoriesUrl, {
-            //         method: 'POST',
-            //         headers: requestHeaders,
-            //         body: JSON.stringify(newInventory)
-            //     })
-            // }
-
-            // LEFT OFF HERE
-            // fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
-            //     method: "PATCH",
-            //     headers: requestHeaders,
-            //     body: JSON.stringify(updatedInventoryItem)
-            // }).then(res => res.json())
-            //     .then(result => showInventory(parseInt(navBar.dataset.userId)))
         }
     })
 
-    function checkInventory(itemId, userId) {
-        let flag = false;
-        fetch(inventoriesUrl)
-            .then(resp => resp.json())
-            .then(function (result) {
-                result.forEach(function (inventory) {
-
-                    if (inventory['item_id'] === itemId && inventory['user_id'] === userId) {
-
-                        flag = true;
-
-                        if (flag === true) {
-
-                            return true;
-                        }
-
-                    }
-                })
-            })
-    }
 
     function summonMonster(itemName) {
         if (itemName === "Tamago") {
@@ -530,9 +539,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(function (res) {
 
                         balance = res['balance'];
-                        itemContainer.innerHTML = `
-              <h1>Balance: ${balance}</h1>
-              `
+                        let h1 = document.createElement('h1')
+                        h1.setAttribute('class', 'balance')
+                        h1.dataset.balance = balance;
+                        h1.innerHTML = `Balance: ${balance}`;
+                        itemContainer.append(h1);
                         items.forEach(function (item) {
                             let div = displayEgg(item);
                             itemContainer.append(div);
@@ -562,6 +573,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <p>Name: ${item.name}, Price: ${item.price} <br>
         ${item['description']}</p>
         `
+        div.dataset.price = item.price;
         div.append(buyBtn);
         // div.append(summonBtn);
         return div;
