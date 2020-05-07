@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <h3>Username: ${user.username}</h3>
         <h3>Nickname: ${user.nickname}</h3>
         <h3>Gender: ${user.gender}</h3>
-        <h3>Balance: ${user.balance}</h3>
+        <h3>Balance: ${formatter.format(user.balance)}</h3>
         `
         let imgDiv = document.createElement(`div`)
         imgDiv.className = "profile-page-img"
@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showEditForm(id) {
+        let profilePage = document.body.querySelector(`.profile-page`)
         fetch(`${usersUrl}/${id}`)
             .then(res => res.json())
             .then(function (userObj) {
@@ -125,13 +126,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 div.setAttribute('class', 'edit-profile-page')
                 div.innerHTML = `
             <form id='edit-profile-form'>
-            <input type="text" name="username" value="${userObj.username}">
-            <input type="text" name="nickname" value="${userObj.nickname}">
-            <select id="gender">
+            <p class="sign2" align="center">Edit User!</p>
+            <input class="uni2" type="text" name="username" value="${userObj.username}">
+            <input class="uni2" type="text" name="nickname" value="${userObj.nickname}">
+            <select class="uni2" id="gender">
                 <option value="male">male</option>
                 <option value="female">female</option>
             </select>
-            <select id="img">
+            <select class="uni2" id="img">
                 <option value="./assets/mario-gif/birdo.gif">Birdo</option>
                 <option value="./assets/mario-gif/bowser.gif">Bowser</option>
                 <option value="./assets/mario-gif/daisy.gif">Daisy</option>
@@ -147,10 +149,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <option value="./assets/mario-gif/toad.gif">Toad</option>
                 <option value="./assets/mario-gif/yoshi.gif">Yoshi</option>
             </select>
-            <input type="submit" value="Submit">
+            <input class="submit3" type="submit" value="Submit">
             </form>
             `
-                document.body.append(div);
+      
+                profilePage.replaceWith(div);
                 div.addEventListener('submit', function (event) {
                     event.preventDefault();
                     let eventTarget = event.target;
@@ -189,13 +192,16 @@ document.addEventListener('DOMContentLoaded', function () {
         div.setAttribute('class', 'sign-up-page')
         div.innerHTML = `
         <form id='sign-up-form'>
-        <input type="text" name="username" value="" placeholder="Enter username">
-        <input type="text" name="nickname" value="" placeholder="Enter nickname">
-        <select id="gender">
+        <p class="sign1" align="center">Register an account!</p>
+        <input class="uni1" type="text" name="username" value="" placeholder="Enter username">
+        <input class="uni1" type="text" name="nickname" value="" placeholder="Enter nickname">
+        <select class="uni1" id="gender">
+            <option selected disabled>Select your gender</option>
             <option value="male">male</option>
             <option value="female">female</option>
         </select>
-        <select id="img">
+        <select class="uni1" id="img">
+            <option selected disabled>Choose an Avatar!</option>
             <option value="./assets/mario-gif/birdo.gif">Birdo</option>
             <option value="./assets/mario-gif/bowser.gif">Bowser</option>
             <option value="./assets/mario-gif/daisy.gif">Daisy</option>
@@ -211,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <option value="./assets/mario-gif/toad.gif">Toad</option>
             <option value="./assets/mario-gif/yoshi.gif">Yoshi</option>
         </select>
-        <input type="submit" value="Submit">
+        <input class="submit2" type="submit" value="Submit">
         </form>
         `
         document.body.append(div);
@@ -301,8 +307,8 @@ document.addEventListener('DOMContentLoaded', function () {
         div.setAttribute("class", "balance-page")
         div.dataset.userBalance = userObject.balance
         div.innerHTML = `
-        <h1>Current Balance : ONLY ${userObject.balance} Credits </h1>
-        <h2>1 USD = 1,000 In game credits!</h2>
+        <h1>Current Balance : <span>O</span><span>N</span><span>L</span><span>Y</span> ${formatter.format(userObject.balance)} Credits </h1>
+        <h3 align="center">1 USD = $1,000 In game credits!</h3>
         <form id='add-balance-form'>
         <p class="sign1" align="center">Recharge Balance!</p>
         <label for="balance">How much credits would you like?</label>
@@ -325,6 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let balance = parseInt(balanceForm.balance.value)
             let userBalance = parseInt(event.target.parentNode.dataset.userBalance)
             let newBalance = balance + userBalance
+            alert(`Thanks for that corn $$$. Your new balance is ${newBalance}`)
             fetch(`${usersUrl}/${id}`, {
                 method: "PATCH",
                 headers: requestHeaders,
@@ -349,6 +356,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderInventoryPage(inventoryItems, id) {
         let inventoryContainer = document.createElement(`div`)
         inventoryContainer.className = `inventory-container`
+        inventoryContainer.innerHTML = `
+        <h1 class="inventory-display">All your items!</h1>
+        `
         document.body.append(inventoryContainer)
         inventoryItems.forEach(function (inventoryItem) {
             if (inventoryItem.user_id === parseInt(id)) {
@@ -361,9 +371,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 inventoryTile.className = `inventory-tile`
                                 inventoryTile.innerHTML = `
                                 <img src=${item.img_url}>
-                                <p>${item.name}<br>
-                                ${item.description}<br>
-                                Quantity: ${inventoryItem.quantity}</p>
+                                <p>${item.name}<p>
+                                <p>${item.description}</p
+                                <p>Quantity: ${inventoryItem.quantity}</p>
                                 `
                                 let summonBtn = document.createElement(`button`)
                                 summonBtn.setAttribute('class', 'summon-button')
@@ -437,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).then(res => res.json())
                     .then(function (result) {
                         h1.dataset.balance = result['balance'];
-                        h1.innerHTML = `Balance: ${result['balance']}`;
+                        h1.innerHTML = `Current Balance: ${formatter.format(result['balance'])}`;
                     })
                 fetchRails(inventoriesUrl)
                     .then(function (result) {
@@ -559,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         let h1 = document.createElement('h1')
                         h1.setAttribute('class', 'balance')
                         h1.dataset.balance = balance;
-                        h1.innerHTML = `Balance: ${balance}`;
+                        h1.innerHTML = `Current Balance: ${formatter.format(balance)}`;
                         itemContainer.append(h1);
                         items.forEach(function (item) {
                             let div = displayEgg(item);
@@ -587,8 +597,9 @@ document.addEventListener('DOMContentLoaded', function () {
         div.dataset.itemId = item.id;
         div.innerHTML = `
         <img src=${item['img_url']}>
-        <p>Name: ${item.name}, Price: ${item.price} <br>
-        ${item['description']}</p>
+        <p>Name: ${item.name}</p> 
+        <p>Price: ${item.price}</p> 
+        <p>${item['description']}</p>
         `
         div.dataset.price = item.price;
         div.append(buyBtn);
@@ -645,3 +656,9 @@ document.addEventListener('DOMContentLoaded', function () {
 function capitalize(string) {
     return string && string[0].toUpperCase() + string.slice(1);
 }
+
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0
+  })
