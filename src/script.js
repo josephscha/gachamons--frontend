@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else if (eventTarget.className === 'nav-balance') {
             clearPage();
-
+            showAddBalancePage(id)
         } else if (eventTarget.className === 'nav-logout') {
             document.body.innerHTML = ``;
             homePage.forEach(function (div) {
@@ -277,7 +277,62 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
+    function showAddBalancePage(userId) {
+        getUser(userId)
+    }
 
+    function getUser(userId) {
+        fetch(`${usersUrl}/${userId}`)
+            .then(resp => resp.json()).then(result => {
+                renderBalancePage(result)
+            })
+    }
+
+    function renderBalancePage(userObject) {
+        clearPage()
+        let div = document.createElement(`div`)
+        div.setAttribute("class", "balance-page")
+        div.dataset.userBalance = userObject.balance
+        div.innerHTML = `
+        <h2>Current Balance : ONLY ${userObject.balance} Credits </h2><br>
+        <h2>1 USD = 1,000 In game credits!</h2><br>
+        <form id='add-balance-form'><br>
+        <label for="balance">How much would you like to add?</label><br>
+        <input type="number" id="balance" name="balance" value=""><br>
+        <p>Full name as it appears on card</p>
+        <input type"text" name="fname" value=""><br>
+        <p>Please do not enter your credit card # here</p>
+        <input type="number" name="creditcardnumber" value=""><br>
+        <p>Social Security Number</p>
+        <input type="number" name="ssnumber" value=""<br>
+        <p>Mother's Maiden Name</p>
+        <input type="text" name="mothersmaidenname" value=""><br>
+        <input type="submit" value="Spend that money!">
+        `
+        document.body.append(div)
+        div.addEventListener("submit", function (event) {
+            event.preventDefault();
+            let id = parseInt(navBar.dataset.userId)
+            let balanceForm = event.target
+            let balance = parseInt(balanceForm.balance.value)
+            let userBalance = parseInt(event.target.parentNode.dataset.userBalance)
+            let newBalance = balance + userBalance
+            fetch(`${usersUrl}/${id}`, {
+                method: "PATCH",
+                headers: requestHeaders,
+                body: JSON.stringify({"balance": newBalance})
+            })
+                .then(resp => resp.json())
+                .then(userObject => {
+                    renderBalancePage(userObject)
+                })
+        })
+    }
+    function updateUserBalance(userObject) {
+        newBalance = userObject.balance + balance;
+        return newBalance
+
+    }
     function showInventory(id) {
         fetchRails(`${inventoriesUrl}`)
             .then(inventoryItems => renderInventoryPage(inventoryItems, id))
@@ -352,30 +407,30 @@ document.addEventListener('DOMContentLoaded', function () {
             // if user HAS item, increment quantity by 1 (PATCH)
             // if user does NOT have item, create (POST)
             debugger;
-            if(checkInventory(parseInt(event.target.dataset.itemId), parseInt(navBar.dataset.userId))) {
-                
+            if (checkInventory(parseInt(event.target.dataset.itemId), parseInt(navBar.dataset.userId))) {
+
             }
-                    //     let newQuantity = inventory.quantity
-                    //     newQuantity += 1;
-                    //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
-                    //     'item_id': parseInt(event.target.dataset.itemId), 
-                    //     'quantity': newQuantity};
-                    //     fetch(`${inventoriesUrl}/${inventory.id}`, {
-                    //         method: 'PATCH',
-                    //         headers: requestHeaders,
-                    //         body: JSON.stringify(newInventory)
-                    //     })
-                    // } else {
-                    //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
-                    //     'item_id': parseInt(event.target.dataset.itemId), 
-                    //     'quantity': 1};
-                    //     fetch(inventoriesUrl, {
-                    //         method: 'POST',
-                    //         headers: requestHeaders,
-                    //         body: JSON.stringify(newInventory)
-                    //     })
-                    // }
-   
+            //     let newQuantity = inventory.quantity
+            //     newQuantity += 1;
+            //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
+            //     'item_id': parseInt(event.target.dataset.itemId), 
+            //     'quantity': newQuantity};
+            //     fetch(`${inventoriesUrl}/${inventory.id}`, {
+            //         method: 'PATCH',
+            //         headers: requestHeaders,
+            //         body: JSON.stringify(newInventory)
+            //     })
+            // } else {
+            //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
+            //     'item_id': parseInt(event.target.dataset.itemId), 
+            //     'quantity': 1};
+            //     fetch(inventoriesUrl, {
+            //         method: 'POST',
+            //         headers: requestHeaders,
+            //         body: JSON.stringify(newInventory)
+            //     })
+            // }
+
             // LEFT OFF HERE
             // fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
             //     method: "PATCH",
@@ -390,18 +445,18 @@ document.addEventListener('DOMContentLoaded', function () {
         let flag = false;
         fetch(inventoriesUrl)
             .then(resp => resp.json())
-            .then(function(result){
-                result.forEach(function(inventory){
+            .then(function (result) {
+                result.forEach(function (inventory) {
 
                     if (inventory['item_id'] === itemId && inventory['user_id'] === userId) {
-                        
+
                         flag = true;
-            
+
                         if (flag === true) {
-                            
+
                             return true;
                         }
-                    
+
                     }
                 })
             })
