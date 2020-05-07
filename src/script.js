@@ -394,20 +394,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         body: JSON.stringify(newObj)
                     })
                 }
-            })
-            
+            })          
             let itemPrice = parseInt(event.target.parentNode.dataset.price);
             let userBalance = parseInt(h1.dataset.balance);
             let newBalance = userBalance - itemPrice;
-
             if (newBalance >= 0) {
-                h1.innerHTML = `Balance: ${newBalance}`;
                 //make a PATCH to user/id
+                fetch(`${usersUrl}/${userId}`, {
+                    method: 'PATCH',
+                    headers: requestHeaders,
+                    body: JSON.stringify({'balance': newBalance})
+                }).then(res => res.json())
+                .then(function(result){
+                    h1.dataset.balance = result['balance'];
+                    h1.innerHTML = `Balance: ${result['balance']}`;
+                })
             } else {
                 alert('Not enough balance!')
             }
-            
-            
         }
     })
 
