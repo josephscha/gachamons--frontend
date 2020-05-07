@@ -4,6 +4,7 @@ const itemsurl = 'http://localhost:3000/items';
 const inventoriesUrl = 'http://localhost:3000/inventories';
 const summonsUrl = 'http://localhost:3000/summons';
 let allMons = []//stroe all monsters
+let allInventories = [];
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -13,13 +14,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    function getMonsArr() {
+    function getMons() {
         fetchRails(monstersUrl)
             .then(function (result) {
                 result.forEach(function (mon) {
                     allMons.push(mon);
                 })
             })
+        // fetchRails(inventoriesUrl)
+        //     .then(function (result) {
+        //         result.forEach(function (mon) {
+        //             allInventories.push(mon);
+        //         })
+        //     })
+    }
+
+    function getInventories() {
+        fetchRails(inventoriesUrl)
+        .then(function (result) {
+            result.forEach(function (mon) {
+                allInventories.push(mon);
+            })
+        })
     }
 
     function filterMons(arr, rarity) {
@@ -31,7 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return result;
     }
-    getMonsArr();
+    
+    getMons();
+    getInventories();
 
     const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
     let navBar = document.querySelector('.nav-bar');
@@ -297,11 +315,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 let inventoryTile = document.createElement(`div`)
                                 inventoryTile.className = `inventory-tile`
                                 inventoryTile.innerHTML = `
-                    <img src=${item.img_url}>
-                    <p>${item.name}<br>
-                    ${item.description}<br>
-                    Quantity: ${inventoryItem.quantity}</p>
-                    `
+                                <img src=${item.img_url}>
+                                <p>${item.name}<br>
+                                ${item.description}<br>
+                                Quantity: ${inventoryItem.quantity}</p>
+                                `
                                 let summonBtn = document.createElement(`button`)
                                 summonBtn.setAttribute('class', 'summon-button')
                                 summonBtn.dataset.inventoryId = inventoryItem.id
@@ -348,34 +366,65 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(result => showInventory(parseInt(navBar.dataset.userId)))
         }
         else if (event.target.className === "buy-button") {
+            let userId = parseInt(navBar.dataset.userId);
+            let itemId = parseInt(event.target.dataset.itemId);
+            //check if current inventories has this item with this id;
+            let flag = checkInventory(userId, itemId);
+            if (flag) {
+                //find this inventory in local array, and increment quantity number
+                let index = findInventory(userId, itemId)
+                allInventories[index].quantity += 1;
+                //PATCH the database with Quantity +=1
+                fetch(`${inventoriesUrl}/${allInventories[index].id}`, {
+                    method: 'PATCH',
+                    headers: requestHeaders,
+                    body: JSON.stringify(allInventories[index])
+                })
+                allInventories = [];
+                getInventories();
+                //Substract the balance
+            } else {
+                //make a post to database
+                let newInventory = {
+                    "item_id": itemId,
+                    "user_id": userId,
+                    "quantity": 1
+                }
+                //allInventories.push(newInventory);
+                fetch(inventoriesUrl, {
+                    method: 'POST',
+                    headers: requestHeaders,
+                    body: JSON.stringify(newInventory)
+                })
+                allInventories = [];
+                getInventories();
+            }
+
             // when user clicks buy button, check inventory to see if user has the item
             // if user HAS item, increment quantity by 1 (PATCH)
             // if user does NOT have item, create (POST)
-            debugger;
-            if(checkInventory(parseInt(event.target.dataset.itemId), parseInt(navBar.dataset.userId))) {
-                
-            }
-                    //     let newQuantity = inventory.quantity
-                    //     newQuantity += 1;
-                    //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
-                    //     'item_id': parseInt(event.target.dataset.itemId), 
-                    //     'quantity': newQuantity};
-                    //     fetch(`${inventoriesUrl}/${inventory.id}`, {
-                    //         method: 'PATCH',
-                    //         headers: requestHeaders,
-                    //         body: JSON.stringify(newInventory)
-                    //     })
-                    // } else {
-                    //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
-                    //     'item_id': parseInt(event.target.dataset.itemId), 
-                    //     'quantity': 1};
-                    //     fetch(inventoriesUrl, {
-                    //         method: 'POST',
-                    //         headers: requestHeaders,
-                    //         body: JSON.stringify(newInventory)
-                    //     })
-                    // }
-   
+
+            //     let newQuantity = inventory.quantity
+            //     newQuantity += 1;
+            //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
+            //     'item_id': parseInt(event.target.dataset.itemId), 
+            //     'quantity': newQuantity};
+            //     fetch(`${inventoriesUrl}/${inventory.id}`, {
+            //         method: 'PATCH',
+            //         headers: requestHeaders,
+            //         body: JSON.stringify(newInventory)
+            //     })
+            // } else {
+            //     let newInventory = {'user_id': parseInt(navBar.dataset.userId), 
+            //     'item_id': parseInt(event.target.dataset.itemId), 
+            //     'quantity': 1};
+            //     fetch(inventoriesUrl, {
+            //         method: 'POST',
+            //         headers: requestHeaders,
+            //         body: JSON.stringify(newInventory)
+            //     })
+            // }
+
             // LEFT OFF HERE
             // fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
             //     method: "PATCH",
@@ -386,26 +435,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
-    function checkInventory(itemId, userId) {
-        let flag = false;
-        fetch(inventoriesUrl)
-            .then(resp => resp.json())
-            .then(function(result){
-                result.forEach(function(inventory){
-
-                    if (inventory['item_id'] === itemId && inventory['user_id'] === userId) {
-                        
-                        flag = true;
-            
-                        if (flag === true) {
-                            
-                            return true;
-                        }
-                    
-                    }
-                })
-            })
+    function checkInventory(userId, itemId) {
+        for (let i = 0; i < allInventories.length; i++) {
+            if (allInventories[i]['item_id'] === itemId && allInventories[i]['user_id'] === userId) {
+                return true;
+            }
+        }
+        return false;
     }
+
+    function findInventory(userId, itemId) {
+        for (let i = 0; i < allInventories.length; i++) {
+            if (allInventories[i]['item_id'] === itemId && allInventories[i]['user_id'] === userId) {
+                return i;
+            }
+        }
+    }
+
 
     function summonMonster(itemName) {
         if (itemName === "Tamago") {
