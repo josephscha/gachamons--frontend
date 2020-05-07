@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
         div.setAttribute("class", "balance-page")
         div.dataset.userBalance = userObject.balance
         div.innerHTML = `
-        <h2>Current Balance : ONLY ${userObject.balance} Credits </h2><br>
+        <h1>Current Balance : ONLY ${userObject.balance} Credits </h1><br>
         <h2>1 USD = 1,000 In game credits!</h2><br>
         <form id='add-balance-form'><br>
         <label for="balance">How much would you like to add?</label><br>
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // when user clicks buy button, check inventory to see if user has the item
             // if user HAS item, increment quantity by 1 (PATCH)
             // if user does NOT have item, create (POST)
-            debugger;
+            // debugger;
             if (checkInventory(parseInt(event.target.dataset.itemId), parseInt(navBar.dataset.userId))) {
 
             }
@@ -547,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let buyBtn = document.createElement('button')
         buyBtn.setAttribute('class', 'buy-button')
         buyBtn.dataset.itemId = item.id
+        buyBtn.dataset.itemName = item.name
         buyBtn.textContent = 'Buy'
 
         // let summonBtn = document.createElement('button')
@@ -592,6 +593,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function showMonster(monster) {
         let div = document.createElement('div')
         div.setAttribute('class', 'monster-tile')
+        div.setAttribute('id', `${monster.rarity}`)
         div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
         <p>${monster.name}, rarity: ${monster.rarity}</p>
