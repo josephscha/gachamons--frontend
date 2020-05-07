@@ -6,12 +6,26 @@ body {
     
 }
 h1 {
-    margin-top: 15vh;
+    margin-top: 10vh;
     margin-bottom: 10vh;
+    margin-left: 30px;
+    margin-right: 30px;
     font-family: "Fredoka One", cursive;
     color: white;
     letter-spacing: 5px;
-    font-size: 5em;
+    font-size: 3em;
+    text-shadow: 3px 3px #384E77;
+    text-align: center;
+}
+.balance {
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+    margin-left: 230px;
+    margin-right: 236px;
+    font-family: "Fredoka One", cursive;
+    color: white;
+    letter-spacing: 5px;
+    font-size: 3em;
     text-shadow: 3px 3px #384E77;
     text-align: center;
 }
@@ -69,5 +83,272 @@ h1 span {
 }
 
 .log-in-button {
+    box-shadow:inset 0px 1px 0px 0px #bbdaf7;
+	background:linear-gradient(to bottom, #1b6ab9 5%, #378de5 100%);
+	background-color:#9fbedd;
+	border-radius:6px;
+	border:1px solid #84bbf3;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:25px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+    text-shadow:0px 1px 0px #528ecc;
+    height: 60px;
+}
+
+.log-in-button:hover {
+	background:linear-gradient(to bottom, #378de5 5%, #79bbff 100%);
+	background-color:#378de5;
+}
+.log-in-button:active {
+	position:relative;
+	top:1px;
+}
+
+.nav-bar {
+    background-color: #FBE4ff;
+    height: 50px;
+    width: 110%;
+    margin-top: -7px;
+    margin-left: -8px;
+    font-family: "Fredoka One", bold;
+}
+
+a {
+    padding-left: 50px;
+    float: left;
+    display: block;
+    color: #000000;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-family: "Fredoka One", bold;
+  }
+
+a:hover {
+    background-color: #FFCBC1;
+    color: white;
+
+}
+.nav-balance {
+    margin-left: 720px;
+}
+
+.nav-logout {
+    margin-left: 15px;
+}
+
+.monster-container, .user-monsters-container, .inventory-container, .egg-container{
+    display: flex;
+    flex-flow: row wrap;
+    align-content: space-around;
+    justify-content: center;
+    text-align: center;
+    /* max-width: 90%; */
+    margin: 0px auto;
+    /* padding: 15px; */
+    max-width: 960px;
+    padding: 2.25%; 
+    width: 85%;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+/* .monster-tile {
+    display: inline-block;
+    height: 100px;
+    width: 20%;
+    border-width: 2px 2px;
+    border-style: solid;
+    border-color: black;
+
+} */
+
+.monster-tile {
+    max-width: 200px;
+    border-radius: 25px;
+    padding: 20px;
+    margin: 10px;
+    /* background-color: lightgrey; */
+    border-style: solid;
+    border-color: black;
+    background-color: rgba(132, 92, 160, 0.4);
+    font-family: "Fredoka One", bold;
+}
+
+.inventory-tile, .item-tile {
+    max-width: 200px;
+    border-radius: 25px;
+    padding: 20px;
+    margin: 10px;
+    /* background-color: lightgrey; */
+    border-style: solid;
+    border-color: black;
+    background-color: rgba(132, 92, 160, 0.4);
+    font-family: "Fredoka One", bold;
+}
+
+.inventory-tile p, .item-tile p {
+    padding: 0px 0;
+    text-align: center;
+}
+
+#normal img {
+    max-width: 50%;
+    padding: 25px;
+    border-radius: 25px;
+    background-color: #CCEEFF;
+}
+
+.monster-tile > img {
     
 }
+
+
+
+#epic img {
+    max-width: 50%;
+    padding: 25px;
+    border-radius: 25px;
+    background-color:#FFFFCC;
+}
+
+#legendary img{
+    max-width: 50%;
+    padding: 5px;
+    border-radius: 25px;
+    background-color: #FFAADD;
+}
+
+p {
+    padding: 70px 0;
+    text-align: center;
+}
+
+#summoned-monster {
+    max-width: 200px;
+    border-radius: 25px;
+    padding: 20px;
+    margin: 10px;
+    /* background-color: lightgrey; */
+    border-style: solid;
+    border-color: black;
+    background-color: rgba(132, 92, 160, 0.4);
+    font-family: "Fredoka One", bold;
+}
+
+#summoned-monster p {
+    padding: 0px 0;
+    text-align: center;
+}
+
+.profile-page {
+    margin: 0;
+    /* position: absolute; */
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-top: 50px;
+    margin-left: 140px;
+    display: inline-block;
+    /* flex-flow: row wrap; */
+    /* align-content: space-around; */
+    justify-content: center;
+    text-align: center;
+    /* max-width: 90%; */
+    /* padding: 15px; */
+    max-width: 500px;
+    padding: 1.25%;
+    width: 60%;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-page-img {
+    display: inline-block;
+    /* flex-flow: row wrap; */
+    /* align-content: space-around; */
+    justify-content: center;
+    text-align: center;
+    /* max-width: 90%; */
+    margin-top: 50px;
+    /* padding: 15px; */
+    max-width: 500px;
+    padding: 2.25%;
+    width: 85%;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-page-img img {
+    max-height: 500px;
+    max-width: auto
+}
+
+.profile-page h3 {
+    font-family: "Fredoka One", bold;
+    font-size: 20;
+}
+
+#add-balance-form {
+    background-color: #FFFFFF;
+    width: 400px;
+    height: 670px;
+    margin-top: 30px;
+    margin-left: 500px;
+    border-radius: 1.5em;
+    box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+}
+
+.uni1 {
+    width: 76%;
+    color: rgb(38, 50, 56);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    margin-bottom: 50px;
+    margin-left: 46px;
+    text-align: center;
+    margin-bottom: 27px;
+    font-family: 'Ubuntu', sans-serif;
+    }
+
+#add-balance-form label {
+    margin-left: 100px;
+}
+
+.sign1 {
+    padding-top: 40px;
+    padding-bottom: 30px;
+    color: black;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+    font-size: 23px;
+}
+
+.submit1 {
+    cursor: pointer;
+      border-radius: 1em;
+      color: #fff;
+      background: linear-gradient(to right, rgb(0, 0, 0), rgb(0, 0, 0));
+      border: 0;
+      padding-left: 40px;
+      padding-right: 40px;
+      padding-bottom: 10px;
+      padding-top: 10px;
+      font-family: 'Ubuntu', sans-serif;
+      margin-left: 25%;
+      margin-top: 20px;
+      font-size: 13px;
+      box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  }

@@ -97,6 +97,10 @@ document.addEventListener('DOMContentLoaded', function () {
         <h3>Nickname: ${user.nickname}</h3>
         <h3>Gender: ${user.gender}</h3>
         <h3>Balance: ${user.balance}</h3>
+        `
+        let imgDiv = document.createElement(`div`)
+        imgDiv.className = "profile-page-img"
+        imgDiv.innerHTML = `
         <img src=${user.img} alt=${user.username}>
         `
         let editBtn = document.createElement('button');
@@ -105,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
         div.append(editBtn);
         div.dataset.userId = user.id;
         document.body.append(div);
+        document.body.append(imgDiv);
         editBtn.addEventListener('click', function (event) {
             let eventTarget = event.target;
             let userId = eventTarget.dataset.userId;
@@ -296,20 +301,21 @@ document.addEventListener('DOMContentLoaded', function () {
         div.setAttribute("class", "balance-page")
         div.dataset.userBalance = userObject.balance
         div.innerHTML = `
-        <h1>Current Balance : ONLY ${userObject.balance} Credits </h1><br>
-        <h2>1 USD = 1,000 In game credits!</h2><br>
-        <form id='add-balance-form'><br>
-        <label for="balance">How much would you like to add?</label><br>
-        <input type="number" id="balance" name="balance" value=""><br>
-        <p>Full name as it appears on card</p>
-        <input type"text" name="fname" value=""><br>
-        <p>Please do not enter your credit card # here</p>
-        <input type="number" name="creditcardnumber" value=""><br>
-        <p>Social Security Number</p>
-        <input type="number" name="ssnumber" value=""<br>
-        <p>Mother's Maiden Name</p>
-        <input type="text" name="mothersmaidenname" value=""><br>
-        <input type="submit" value="Spend that money!">
+        <h1>Current Balance : ONLY ${userObject.balance} Credits </h1>
+        <h2>1 USD = 1,000 In game credits!</h2>
+        <form id='add-balance-form'>
+        <p class="sign1" align="center">Recharge Balance!</p>
+        <label for="balance">How much credits would you like?</label>
+        <input class="uni1" type="number" id="balance" name="balance" value="">
+        <label for="fname">Full name as it appears on card</label>
+        <input class="uni1" type"text" name="fname" value="">
+        <label for="creditcardnumber">Please do not enter your credit card # here</label>
+        <input class="uni1" type="number" name="creditcardnumber" value="">
+        <label for="ssnumber">Social Security Number</label>
+        <input class="uni1" type="number" name="ssnumber" value="">
+        <label for="mothersmaidenname">Mother's Maiden Name</label>
+        <input class="uni1" type="text" name="mothersmaidenname" value="">
+        <input class="submit1" type="submit" value="Spend that money!">
         `
         document.body.append(div)
         div.addEventListener("submit", function (event) {
@@ -322,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(`${usersUrl}/${id}`, {
                 method: "PATCH",
                 headers: requestHeaders,
-                body: JSON.stringify({"balance": newBalance})
+                body: JSON.stringify({ "balance": newBalance })
             })
                 .then(resp => resp.json())
                 .then(userObject => {
@@ -389,14 +395,22 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.addEventListener("click", function (event) {
         if (event.target.className === "summon-button") {
             clearPage()
+            let div = document.createElement(`div`);
+            div.className = "monster-container"
+            document.body.append(div)
             newQuantity = parseInt(event.target.dataset.quantity) - 1
             updatedInventoryItem = { "user_id": parseInt(navBar.dataset.userId), "item_id": parseInt(event.target.dataset.itemId), "quantity": newQuantity }
             event.target.dataset.quantity = newQuantity
             let monster = summonMonster(event.target.dataset.itemName)
-            let summonedMonster = showMonster(monster)
+            let summonedMonsterDiv = document.createElement(`div`)
+            summonedMonsterDiv.innerHTML = `
+            <img src=${monster.img_url}>
+            <p>Here is your new monster!</p>
+            `
             addMonsterToDatabase(monster)
-            summonedMonster.setAttribute("id", "summoned-monster")
-            document.body.append(summonedMonster)
+            summonedMonsterDiv.setAttribute("id", `summoned-monster`)
+            //render that summoning gif then replace node with summonedmonsterdiv
+            div.append(summonedMonsterDiv)
             fetch(`${inventoriesUrl}/${parseInt(event.target.dataset.inventoryId)}`, {
                 method: "PATCH",
                 headers: requestHeaders,
@@ -425,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         h1.dataset.balance = result['balance'];
                         h1.innerHTML = `Balance: ${result['balance']}`;
                     })
-                    fetchRails(inventoriesUrl)
+                fetchRails(inventoriesUrl)
                     .then(function (result) {
                         let flag = false;
                         let quantity = 1;
@@ -511,6 +525,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (array) {
                 let userMonsters = document.createElement('div')
                 userMonsters.setAttribute('class', 'user-monsters-container')
+                userMonsters.innerHTML = `
+                <h1>Here are all your summoned monsters!</h1>
+                `
                 document.body.append(userMonsters)
                 array.forEach(function (summon) {
                     if (summon['user_id'] === parseInt(userId)) {
@@ -593,6 +610,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(function (result) {
                 let monsterContainer = document.createElement('div')
+                monsterContainer.innerHTML = `
+                <h1>Here are all monsters available!</h1>
+                `
                 document.body.append(monsterContainer);
                 monsterContainer.setAttribute('class', 'monster-container');
                 result.forEach(function (monster) {
@@ -608,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
         div.setAttribute('id', `${monster.rarity}`)
         div.innerHTML = `
         <img src=${monster.img_url} alt=${monster.name}>
-        <p>${monster.name}, rarity: ${monster.rarity}</p>
+        <h3>${capitalize(monster.name)}</h3><br> <h3>Rarity: ${capitalize(monster.rarity)}</h3>
         `
         return div;
     }
@@ -621,3 +641,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return navBar;
     }
 })
+
+function capitalize(string) {
+    return string && string[0].toUpperCase() + string.slice(1);
+}
