@@ -353,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // when user clicks buy button, check inventory to see if user has the item
             // if user HAS item, increment quantity by 1 (PATCH)
             // if user does NOT have item, create (POST)
+            let h1 = document.querySelector('.balance');
             let userId = parseInt(navBar.dataset.userId);
             let itemId = parseInt(event.target.dataset.itemId);
             fetchRails(inventoriesUrl)
@@ -392,9 +393,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         headers: requestHeaders, 
                         body: JSON.stringify(newObj)
                     })
-                    
                 }
             })
+            
+            let itemPrice = parseInt(event.target.parentNode.dataset.price);
+            let userBalance = parseInt(h1.dataset.balance);
+            let newBalance = userBalance - itemPrice;
+
+            if (newBalance >= 0) {
+                h1.innerHTML = `Balance: ${newBalance}`;
+                //make a PATCH to user/id
+            } else {
+                alert('Not enough balance!')
+            }
+            
+            
         }
     })
 
@@ -467,9 +480,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(function (res) {
 
                         balance = res['balance'];
-                        itemContainer.innerHTML = `
-              <h1>Balance: ${balance}</h1>
-              `
+                        let h1 = document.createElement('h1')
+                        h1.setAttribute('class', 'balance')
+                        h1.dataset.balance = balance;
+                        h1.innerHTML = `Balance: ${balance}`;
+                        itemContainer.append(h1);
                         items.forEach(function (item) {
                             let div = displayEgg(item);
                             itemContainer.append(div);
@@ -498,6 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <p>Name: ${item.name}, Price: ${item.price} <br>
         ${item['description']}</p>
         `
+        div.dataset.price = item.price;
         div.append(buyBtn);
         // div.append(summonBtn);
         return div;
