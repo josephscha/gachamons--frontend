@@ -98,7 +98,7 @@ h1 span {
     size: large;
 }
 
-.log-in-button {
+.log-in-button{
     box-shadow:inset 0px 1px 0px 0px #bbdaf7;
 	background:linear-gradient(to bottom, #1b6ab9 5%, #378de5 100%);
 	background-color:#9fbedd;
@@ -475,4 +475,21 @@ p {
 .inventory-display {
     margin-left: 185px;
     margin-right: 185px;
+}
+
+#normal-btn, #epic-btn, #legendary-btn {
+    box-shadow:inset 0px 1px 0px 0px #bbdaf7;
+	background:linear-gradient(to bottom, #1b6ab9 5%, #378de5 100%);
+	background-color:#9fbedd;
+	border-radius:6px;
+	border:1px solid #84bbf3;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:16px;
+	font-weight:bold;
+	padding:4px 19px;
+	text-decoration:none;
+    text-shadow:0px 1px 0px #528ecc;
+    transform: translate(250px, 190px);
 }

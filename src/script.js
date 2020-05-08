@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <input class="submit3" type="submit" value="Submit">
             </form>
             `
-      
+
                 profilePage.replaceWith(div);
                 div.addEventListener('submit', function (event) {
                     event.preventDefault();
@@ -499,9 +499,45 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 alert('Not enough balance!')
             }
+        } else if (event.target.id === "normal-btn") {
+            clearPage();
+            filterAndShowMons('normal')
+        } else if (event.target.id === "epic-btn") {
+            clearPage();
+            filterAndShowMons('epic')
+        } else if (event.target.id === "legendary-btn") {
+            clearPage();
+            filterAndShowMons('legendary');
         }
     })
 
+    function filterAndShowMons(rarity) {
+        let monsterContainer = document.createElement('div')
+        let norBtn = document.createElement('button')
+        norBtn.setAttribute('id', 'normal-btn')
+        norBtn.innerHTML = 'Normal Monsters'
+        document.body.append(norBtn);
+
+        let epicBtn = document.createElement('button')
+        epicBtn.setAttribute('id', 'epic-btn')
+        epicBtn.innerHTML = 'Epic Monsters'
+        document.body.append(epicBtn);
+
+        let legendaryBtn = document.createElement('button')
+        legendaryBtn.setAttribute('id', 'legendary-btn')
+        legendaryBtn.innerHTML = 'Legendary Monsters'
+        document.body.append(legendaryBtn);
+
+        monsterContainer.innerHTML = `
+        <h1>Here are all monsters available!</h1>
+        `
+        document.body.append(monsterContainer);
+        monsterContainer.setAttribute('class', 'monster-container');
+        filterMons(allMons, rarity).forEach(function (monster) {
+            let div = showMonster(monster)
+            monsterContainer.append(div);
+        })
+    }
 
     function summonMonster(itemName) {
         if (itemName === "Tamago") {
@@ -628,6 +664,21 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(monstersUrl)
             .then(res => res.json())
             .then(function (result) {
+                let norBtn = document.createElement('button')
+                norBtn.setAttribute('id', 'normal-btn')
+                norBtn.innerHTML = 'Normal Monsters'
+                document.body.append(norBtn);
+
+                let epicBtn = document.createElement('button')
+                epicBtn.setAttribute('id', 'epic-btn')
+                epicBtn.innerHTML = 'Epic Monsters'
+                document.body.append(epicBtn);
+
+                let legendaryBtn = document.createElement('button')
+                legendaryBtn.setAttribute('id', 'legendary-btn')
+                legendaryBtn.innerHTML = 'Legendary Monsters'
+                document.body.append(legendaryBtn);
+
                 let monsterContainer = document.createElement('div')
                 monsterContainer.innerHTML = `
                 <h1>Here are all monsters available!</h1>
@@ -658,8 +709,8 @@ document.addEventListener('DOMContentLoaded', function () {
         audioBar = document.querySelector(`.audio-player`)
         navBar = document.querySelector('.nav-bar');
         let children = Array.from(document.body.children)
-        for (let i = 0; i < children.length; i++){
-            if (children[i] !== audioBar && children[i] !== navBar){
+        for (let i = 0; i < children.length; i++) {
+            if (children[i] !== audioBar && children[i] !== navBar) {
                 children[i].remove()
             }
         }
@@ -677,4 +728,4 @@ const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0
-  })
+})
