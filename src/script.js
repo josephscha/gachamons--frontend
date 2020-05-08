@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const switchDisplay = { 'Display': 'block', 'Disappear': 'none' };
     let navBar = document.querySelector('.nav-bar');
+    let audioBar = document.querySelector(`.audio-bar`)
     navBar.style.display = switchDisplay['Disappear'];
     let homePage = Array.from(document.body.children);
 
@@ -652,10 +653,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function clearPage() {
+
         //let children = Array.from(document.body.children);
+        audioBar = document.querySelector(`.audio-player`)
         navBar = document.querySelector('.nav-bar');
-        document.body.innerHTML = ``;
-        document.body.append(navBar);
+        let children = Array.from(document.body.children)
+        for (let i = 0; i < children.length; i++){
+            if (children[i] !== audioBar && children[i] !== navBar){
+                children[i].remove()
+            }
+        }
+
+        // document.body.append(navBar);
         return navBar;
     }
 })

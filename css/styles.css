@@ -1,7 +1,7 @@
 body {
     /* background-color: rgb(149, 145, 212); */
     background: url("https://github.com/ZeChrales/PogoAssets/blob/master/static_assets/png/Parkscene_Background.png?raw=true");
-    background-size: auto 670px;
+    background-size: auto 825px;
     background-attachment: fixed;
 }
 
@@ -13,6 +13,13 @@ body {
 } */
 .home-page {
     margin-top: 200px;
+    display: inline-block;
+    margin-left: 185px;
+}
+
+.audio-player {
+    transform: translateX(225%);
+    position: absolute;
 }
 h1 {
     margin-top: 5vh;
